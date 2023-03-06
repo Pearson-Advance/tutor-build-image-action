@@ -13,7 +13,7 @@ inputs:
   repository-name:
     description: 'Name of the repository in Docker Hub.'
     required: true
-  image-to-be-built:
+  path-image-to-be-built:
     description: 'Image to be built.'
     required: true
   image-name:
@@ -29,6 +29,10 @@ inputs:
   docker-token:
     description: 'Docker Hub token.'
     required: true
+  no-docker-cache:
+    description: 'Determines whether to use caching during image building.'
+    required: false
+    default: false
 
 runs:
   using: "composite"
@@ -64,14 +68,13 @@ runs:
       shell: bash
 
     - name: Render Tutor Templates
-      run: tutor config save
+      run: |
+        source venv/bin/activate
+        tutor config save
       shell: bash
 
-    - name: Build image
-      run: |
-        tutor images build ${{ inputs.image-to-be-built }} \
-            --docker-arg --tag="${{ inputs.repository-name }}/${{ inputs.image-name }}:${{ inputs.image-tag }}"
-      shell: bash
+    - name: Setup buildx
+      uses: docker/setup-buildx-action@v2
 
     - name: Login to Docker Hub
       uses: docker/login-action@v2
@@ -79,6 +82,12 @@ runs:
         username: ${{ inputs.docker-username }}
         password: ${{ inputs.docker-token }}
 
-    - name: Push image to DockerHub
-      run: docker push ${{ inputs.repository-name }}/${{ inputs.image-name }}:${{ inputs.image-tag }}
-      shell: bash
+    - name: Build and push
+      uses: docker/build-push-action@v4
+      with:
+        context: /home/runner/.local/share/tutor/${{ inputs.path-image-to-be-built }}
+        push: true
+        tags: "${{ inputs.repository-name }}/${{ inputs.image-name }}:${{ inputs.image-tag }}"
+        no-cache: ${{ inputs.no-docker-cache }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
