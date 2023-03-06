@@ -33,6 +33,18 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - uses: actions/checkout@v3
+
+    - name: Cache Tutor requirements
+      id: cache-pip
+      uses: actions/cache@v3
+      env:
+        cache-name: cache-pip-requirements
+      with:
+        path: ./venv
+        key: ${{ runner.os }}-${{ env.cache-name }}-requirements
+        restore-keys: |
+          ${{ runner.os }}-${{ env.cache-name }}
 
     - name: Setup Python
       uses: actions/setup-python@v4
@@ -46,7 +58,9 @@ runs:
       shell: bash
 
     - name: Install Tutor
-      run: pip install tutor==${{ inputs.tutor-version }}
+      run: |
+        source venv/bin/activate
+        python -m pip install tutor==${{ inputs.tutor-version }}
       shell: bash
 
     - name: Render Tutor Templates
