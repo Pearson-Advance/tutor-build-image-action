@@ -32,7 +32,28 @@ inputs:
   no-docker-cache:
     description: 'Determines whether to use caching during image building.'
     required: false
-    default: false
+    default: 'false'
+  extra-private-requirements:
+    description: 'Bool input that indicates if It is necessary to install extra private requirements.'
+    required: false
+    default: 'false'
+  theme-repository:
+    description: 'Repository that contains customized themes. It is important that has this sintax <owner>/<repository> (e.g., Pearson-Advance/openedx-themes).'
+    required: false
+    default: ''
+  theme-branch:
+    description: 'Theme repository branch to be cloned (e.g., pearson-release/juniper.master).'
+    required: false
+    default: ''
+  gh-access-token:
+    description: 'Personal Access Token (PAT). PAT are an alternative to using passwords for authentication to GitHub when using the GitHub API or the command line.'
+    required: true
+  private-repositories:
+    description: 'Private repositories to be cloned. It is an array that contains the name of each repository (e.g., ("pearson-core" "course_operations"))'
+    required: false
+  branches:
+    description: 'Target branches to be cloned. It is an array that contains all branches for each private repository (e.g., ("master" "quality"))'
+    required: false
 
 runs:
   using: "composite"
@@ -65,6 +86,31 @@ runs:
       run: |
         source venv/bin/activate
         python -m pip install tutor==${{ inputs.tutor-version }}
+      shell: bash
+
+    - if: ${{ inputs.extra-private-requirements == 'true' }}
+      name: Install extra requirements
+      run: |
+        # repositores is an array that contains private repositories.
+        repositories=${{ inputs.private-repositories }}
+        branches=${{ inputs.branches }}
+        COUNTER=0
+        for repository in "${repositories[@]}"; do
+          git clone -b ${branches[$COUNTER]} https://${{ inputs.gh-access-token }}@github.com/Pearson-Advance/$repository.git \
+            "$(tutor config printroot)/env/build/openedx/requirements/$repository"
+          echo "-e ./$repository" >> "$(tutor config printroot)/env/build/openedx/requirements/private.txt"
+          let COUNTER=COUNTER+1
+        done
+      shell: bash
+
+    - if: ${{ inputs.theme-repository != '' }}
+      name: Install themes
+      run: |
+        themes_path="$(tutor config printroot)/env/build/openedx/themes"
+        mkdir -p $themes_path
+        git clone -b ${{ inputs.theme-branch }} ${{ inputs.theme-repository }}
+        cd openedx-themes/edx-platform
+        mv * $themes_path
       shell: bash
 
     - name: Render Tutor Templates
