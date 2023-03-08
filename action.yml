@@ -101,9 +101,8 @@ runs:
     - if: ${{ inputs.extra-private-requirements == 'true' }}
       name: Install extra requirements
       run: |
-        # repositores is an array that contains private repositories.
-        repositories=${{ inputs.private-repositories }}
-        branches=${{ inputs.branches }}
+        repositories=${{ inputs.private-repositories }} # It is an array that contains private repositories.
+        branches=${{ inputs.branches }} # branches has to be set in the same order as repositories.
         COUNTER=0
         for repository in "${repositories[@]}"; do
           git clone -b ${branches[$COUNTER]} https://${{ inputs.gh-access-token }}@github.com/Pearson-Advance/$repository.git \
@@ -117,10 +116,10 @@ runs:
       name: Install themes
       run: |
         themes_path="$(tutor config printroot)/env/build/openedx/themes"
-        mkdir -p $themes_path
+        mkdir -p $themes_path # This will be a directory that will contain custom themes.
         git clone -b ${{ inputs.theme-branch }} ${{ inputs.theme-repository }}
         cd openedx-themes/edx-platform
-        mv * $themes_path
+        mv * $themes_path # To compile our own themes, It is necessary move them to the directory created previously.
       shell: bash
 
     - name: Render Tutor Templates
