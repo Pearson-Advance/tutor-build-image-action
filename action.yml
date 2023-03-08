@@ -127,21 +127,21 @@ runs:
         mv * $themes_path # To compile our own themes, It is necessary move them to the directory created previously.
       shell: bash
 
-    - name: Setup buildx
-      uses: docker/setup-buildx-action@v2
+    # - name: Setup buildx
+    #   uses: docker/setup-buildx-action@v2
 
-    - name: Login to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ inputs.docker-username }}
-        password: ${{ inputs.docker-token }}
+    # - name: Login to Docker Hub
+    #   uses: docker/login-action@v2
+    #   with:
+    #     username: ${{ inputs.docker-username }}
+    #     password: ${{ inputs.docker-token }}
 
-    - name: Build and push
-      uses: docker/build-push-action@v4
-      with:
-        context: /home/runner/.local/share/tutor/${{ inputs.path-image-to-be-built }}
-        push: true
-        tags: "${{ inputs.repository-name }}/${{ inputs.image-name }}:${{ inputs.image-tag }}"
-        no-cache: ${{ inputs.no-docker-cache }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+    # - name: Build and push
+    #   uses: docker/build-push-action@v4
+    #   with:
+    #     context: /home/runner/.local/share/tutor/${{ inputs.path-image-to-be-built }}
+    #     push: true
+    #     tags: "${{ inputs.repository-name }}/${{ inputs.image-name }}:${{ inputs.image-tag }}"
+    #     no-cache: ${{ inputs.no-docker-cache }}
+    #     cache-from: type=gha
+    #     cache-to: type=gha,mode=max
