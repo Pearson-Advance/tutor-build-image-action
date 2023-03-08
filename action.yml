@@ -101,6 +101,7 @@ runs:
     - if: ${{ inputs.extra-private-requirements == 'true' }}
       name: Install extra requirements
       run: |
+        source venv/bin/activate
         repositories=${{ inputs.private-repositories }} # It is an array that contains private repositories.
         branches=${{ inputs.branches }} # branches has to be set in the same order as repositories.
         COUNTER=0
