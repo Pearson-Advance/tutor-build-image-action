@@ -66,8 +66,8 @@ inputs:
     default: 'false'
   building-plugin:
     description: 'Determines wheter the image to be built is for a tutor plugin.'
-    default: false
     required: false
+    default: 'false'
   enable-plugins-list:
     description: 'String cotaining the plugins required to be enabled separated by spaces.'
     required: false
