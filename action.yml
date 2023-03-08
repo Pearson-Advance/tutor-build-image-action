@@ -98,12 +98,6 @@ runs:
         python -m pip install tutor==${{ inputs.tutor-version }}
       shell: bash
 
-    - name: Render Tutor Templates
-      run: |
-        source venv/bin/activate
-        tutor config save
-      shell: bash
-
     - if: ${{ inputs.extra-private-requirements == 'true' }}
       name: Install extra requirements
       run: |
@@ -118,14 +112,20 @@ runs:
         done
       shell: bash
 
-    - if: ${{ inputs.theme-repository != '' }}
-      name: Install themes
+    - name: Render Tutor Templates
       run: |
-        themes_path="$(tutor config printroot)/env/build/openedx/themes"
-        git clone -b ${{ inputs.theme-branch }} ${{ inputs.theme-repository }}
-        cd openedx-themes/edx-platform
-        mv * $themes_path # To compile our own themes, It is necessary move them to the directory created previously.
+        source venv/bin/activate
+        tutor config save
       shell: bash
+
+    # - if: ${{ inputs.theme-repository != '' }}
+    #   name: Install themes
+    #   run: |
+    #     themes_path="$(tutor config printroot)/env/build/openedx/themes"
+    #     git clone -b ${{ inputs.theme-branch }} ${{ inputs.theme-repository }}
+    #     cd openedx-themes/edx-platform
+    #     mv * $themes_path # To compile our own themes, It is necessary move them to the directory created previously.
+    #   shell: bash
 
     # - name: Setup buildx
     #   uses: docker/setup-buildx-action@v2
