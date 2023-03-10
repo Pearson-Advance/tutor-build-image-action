@@ -65,7 +65,7 @@ inputs:
     required: false
     default: 'false'
   plugins:
-    description: 'Array containing the plugin names to be installed and enabled. Value example: ("discovery" "ecommerce" "mfe")'
+    description: 'JSON array string containing the information of the plugins desired to install. Example: "[{"plugin_name":"ecommerce","package_name":"tutor-ecommerce==15"},{"plugin_name":"discovery","package_name":"tutor-discovery==15"},{"plugin_name":"mfe","package_name":"tutor-mfe==15"}]"'
     required: false
     default: ''
 
@@ -103,21 +103,19 @@ runs:
       shell: bash
 
     - name: Render Tutor Templates
+      shell: bash
       run: |
         source venv/bin/activate
         tutor config save
-      shell: bash
 
     - if: ${{ inputs.plugins != '' }}
       name: Install and enable plugins
       run: |
         source venv/bin/activate
-        plugin_array=${{inputs.plugins}}
-        for plugin in "${plugin_array[@]}"; do
-          echo Activating plugin $plugin
-          python -m pip install tutor-$plugin
-          tutor plugins enable $plugin
-        done
+        python ${{ github.action_path }}/create_plugins_files.py '${{ inputs.plugins }}' '${{ github.workspace }}'
+
+        pip install -r plugins_requirements.txt
+        tutor plugins enable $(cat plugins_to_enable.txt)
         tutor config save
       shell: bash
 
