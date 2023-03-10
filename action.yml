@@ -65,7 +65,7 @@ inputs:
     required: false
     default: 'false'
   plugins:
-    description: 'Array containing the plugins wanted to install and enable. Value example: ("discovery" "ecommerce" "mfe")'
+    description: 'Array containing the plugin names to be installed and enabled. Value example: ("discovery" "ecommerce" "mfe")'
     required: false
     default: ''
 
