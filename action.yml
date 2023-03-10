@@ -64,6 +64,10 @@ inputs:
     description: 'Determines whether to use caching during image building.'
     required: false
     default: 'false'
+  plugins:
+    description: 'JSON array string containing the information of the plugins desired to install. Example: "[{"plugin_name":"ecommerce","package_name":"tutor-ecommerce==15"},{"plugin_name":"discovery","package_name":"tutor-discovery==15"},{"plugin_name":"mfe","package_name":"tutor-mfe==15"}]"'
+    required: false
+    default: ''
 
 runs:
   using: "composite"
@@ -99,8 +103,19 @@ runs:
       shell: bash
 
     - name: Render Tutor Templates
+      shell: bash
       run: |
         source venv/bin/activate
+        tutor config save
+
+    - if: ${{ inputs.plugins != '' }}
+      name: Install and enable plugins
+      run: |
+        source venv/bin/activate
+        python ${{ github.action_path }}/create_plugins_files.py '${{ inputs.plugins }}' '${{ github.workspace }}'
+
+        pip install -r plugins_requirements.txt
+        tutor plugins enable $(cat plugins_to_enable.txt)
         tutor config save
       shell: bash
 
