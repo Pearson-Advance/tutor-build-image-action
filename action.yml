@@ -64,16 +64,10 @@ inputs:
     description: 'Determines whether to use caching during image building.'
     required: false
     default: 'false'
-  building-plugin:
-    description: 'Determines wheter the image to be built is for a tutor plugin.'
+  plugins:
+    description: 'Array containing the plugins wanted to install and enable. Value example: ("discovery" "ecommerce" "mfe")'
     required: false
-    default: 'false'
-  enable-plugins-list:
-    description: 'String cotaining the plugins required to be enabled separated by spaces.'
-    required: false
-  plugin-package:
-    description: 'Name of the python package (pypi) of the plugin being built.'
-    required: false
+    default: ''
 
 runs:
   using: "composite"
@@ -114,13 +108,18 @@ runs:
         tutor config save
       shell: bash
 
-    - if: ${{ inputs.building-plugin }}
-      name: Install and enable plugin
+    - if: ${{ inputs.plugins != '' }}
+      name: Install and enable plugins
       run: |
         source venv/bin/activate
-        python -m pip install ${{ inputs.plugin-package }}==${{ inputs.tutor-version }}
-        tutor plugins enable ${{ inputs.enable-plugins-list }}
+        plugin_array=${{inputs.plugins}}
+        for plugin in "${plugin_array[@]}"; do
+          echo Activating plugin $plugin
+          python -m pip install tutor-$plugin
+          tutor plugins enable $plugin
+        done
         tutor config save
+      shell: bash
 
     - if: ${{ inputs.extra-private-requirements == 'true' }}
       name: Install extra requirements
