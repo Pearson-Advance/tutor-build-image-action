@@ -64,6 +64,10 @@ inputs:
     description: 'Determines whether to use caching during image building.'
     required: false
     default: 'false'
+  install-tutor-pearson-plugin:
+    description: 'Bool input that indicates if It is necessary to install the private tutor-pearson-plugin.'
+    required: false
+    default: 'false'
 
 runs:
   using: "composite"
@@ -117,6 +121,17 @@ runs:
           echo "-e ./$repository" >> "$(tutor config printroot)/env/build/openedx/requirements/private.txt"
           let COUNTER=COUNTER+1
         done
+      shell: bash
+
+    - if: ${{ inputs.install-tutor-pearson-plugin == 'true' }}
+      name: Install tutor-pearson-plugin
+      run: |
+        source venv/bin/activate
+        git clone -b https://${{ inputs.gh-access-token }}@github.com/Pearson-Advance/tutor-pearson-plugin.git \
+          "$(tutor config printroot)/env/build/openedx/requirements/tutor-pearson-plugin"
+        echo "-e ./tutor-pearson-plugin" >> "$(tutor config printroot)/env/build/openedx/requirements/private.txt"
+        tutor plugins enable pearson-plugin
+        tutor config save
       shell: bash
 
     - if: ${{ inputs.theme-repository != '' }}
