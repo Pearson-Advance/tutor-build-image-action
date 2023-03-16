@@ -70,6 +70,10 @@ inputs:
                   (e.g., "git+https://GH_TOKEN@github.com/Pearson-Advance/tutor-pearson-plugin.git")'
     required: false
     default: ''
+  tutor-plugin-sources:
+    description: 'Array containing the GitHub sources urls or the pypi package names of the plugins to install. Example: ("git+https://github.com/overhangio/tutor-ecommerce.git" "git+https://github.com/overhangio/tutor-mfe.git" "tutor-discovery")'
+    required: false
+    default: ''
 
 runs:
   using: "composite"
@@ -117,6 +121,16 @@ runs:
         GH_TOKEN_URL=$(modify_tutor_pearson_plugin_url $URL)
         pip install $GH_TOKEN_URL
         tutor plugins enable pearson-plugin
+
+    - if: ${{ inputs.tutor-plugin-sources != '' }}
+      name: Install plugins
+      run: |
+        source venv/bin/activate
+        plugin_sources=${{ inputs.tutor-plugin-sources }}
+        for plugin_source in "${plugin_sources[@]}"; do
+          pip install $plugin_source
+        done
+      shell: bash
 
     - name: Render Tutor Templates
       run: |
