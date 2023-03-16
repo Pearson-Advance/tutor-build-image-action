@@ -74,6 +74,10 @@ inputs:
     description: 'Array containing the GitHub sources urls or the pypi package names of the plugins to install. Example: ("git+https://github.com/overhangio/tutor-ecommerce.git" "git+https://github.com/overhangio/tutor-mfe.git" "tutor-discovery")'
     required: false
     default: ''
+  tutor-plugin-names:
+    description: 'Array containing the names of the plugins to enable. Example: ("ecommerce" "discovery" "mfe")'
+    required: false
+    default: ''
 
 runs:
   using: "composite"
@@ -132,11 +136,21 @@ runs:
         done
       shell: bash
 
+    - if: ${{ inputs.tutor-plugin-names != '' }}
+      name: Enable plugins
+      run: |
+        source venv/bin/activate
+        plugin_names=${{ inputs.tutor-plugin-names }}
+        for plugin in "${plugin_names[@]}"; do
+          tutor plugins enable $plugin
+        done
+      shell: bash
+
     - name: Render Tutor Templates
+      shell: bash
       run: |
         source venv/bin/activate
         tutor config save
-      shell: bash
 
     - if: ${{ inputs.extra-private-requirements == 'true' }}
       name: Install extra requirements
