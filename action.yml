@@ -60,7 +60,7 @@ inputs:
                   You have to be careful with this array and repositories array, because both should have the same length, \
                   and correctly set the branch for each repository.'
     required: false
-  no-docker-cache:
+  use-docker-cache:
     description: 'Determines whether to use caching during image building.'
     required: false
     default: 'false'
@@ -112,7 +112,8 @@ runs:
         python -m pip install tutor==${{ inputs.tutor-version }}
       shell: bash
 
-    - name: Install the Tutor Pearson Plugin
+    - if: ${{ inputs.tutor-pearson-plugin-url != '' }}
+      name: Install the Tutor Pearson Plugin
       shell: bash
       run: |
         source venv/bin/activate
@@ -192,6 +193,6 @@ runs:
         context: /home/runner/.local/share/tutor/${{ inputs.path-image-to-be-built }}
         push: true
         tags: "${{ inputs.repository-name }}/${{ inputs.image-name }}:${{ inputs.image-tag }}"
-        no-cache: ${{ inputs.no-docker-cache }}
+        no-cache: ${{ inputs.use-docker-cache == 'false' }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
