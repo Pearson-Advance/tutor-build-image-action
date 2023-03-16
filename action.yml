@@ -64,6 +64,12 @@ inputs:
     description: 'Determines whether to use caching during image building.'
     required: false
     default: 'false'
+  tutor-pearson-plugin-url:
+    description: 'Action environment variable to obtain the tutor pearson plugin URL from GitHub following
+                  https://docs.github.com/en/actions/learn-github-actions/variables#defining-configuration-variables-for-multiple-workflows.
+                  (e.g., "git+https://GH_TOKEN@github.com/Pearson-Advance/tutor-pearson-plugin.git")'
+    required: false
+    default: ''
 
 runs:
   using: "composite"
@@ -97,6 +103,20 @@ runs:
         source venv/bin/activate
         python -m pip install tutor==${{ inputs.tutor-version }}
       shell: bash
+
+    - name: Install the Tutor Pearson Plugin
+      shell: bash
+      run: |
+        source venv/bin/activate
+        function modify_tutor_pearson_plugin_url() {
+          local tutor_plugin_url=$1
+          local tutor_plugin_url_and_token=${tutor_plugin_url/GH_TOKEN/${{ inputs.gh-access-token }}}
+          echo $tutor_plugin_url_and_token
+        }
+        URL=${{ inputs.tutor-pearson-plugin-url }}
+        GH_TOKEN_URL=$(modify_tutor_pearson_plugin_url $URL)
+        pip install $GH_TOKEN_URL
+        tutor plugins enable pearson-plugin
 
     - name: Render Tutor Templates
       run: |
