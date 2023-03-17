@@ -60,7 +60,7 @@ inputs:
                   You have to be careful with this array and repositories array, because both should have the same length, \
                   and correctly set the branch for each repository.'
     required: false
-  no-docker-cache:
+  use-docker-cache:
     description: 'Determines whether to use caching during image building.'
     required: false
     default: 'false'
@@ -68,6 +68,14 @@ inputs:
     description: 'Action environment variable to obtain the tutor pearson plugin URL from GitHub following
                   https://docs.github.com/en/actions/learn-github-actions/variables#defining-configuration-variables-for-multiple-workflows.
                   (e.g., "git+https://GH_TOKEN@github.com/Pearson-Advance/tutor-pearson-plugin.git")'
+    required: false
+    default: ''
+  tutor-plugin-sources:
+    description: 'Array containing the GitHub sources urls or the pypi package names of the plugins to install. Example: ("git+https://github.com/overhangio/tutor-ecommerce.git" "git+https://github.com/overhangio/tutor-mfe.git" "tutor-discovery")'
+    required: false
+    default: ''
+  tutor-plugin-names:
+    description: 'Array containing the names of the plugins to enable. Example: ("ecommerce" "discovery" "mfe")'
     required: false
     default: ''
 
@@ -104,7 +112,8 @@ runs:
         python -m pip install tutor==${{ inputs.tutor-version }}
       shell: bash
 
-    - name: Install the Tutor Pearson Plugin
+    - if: ${{ inputs.tutor-pearson-plugin-url != '' }}
+      name: Install the Tutor Pearson Plugin
       shell: bash
       run: |
         source venv/bin/activate
@@ -118,11 +127,31 @@ runs:
         pip install $GH_TOKEN_URL
         tutor plugins enable pearson-plugin
 
+    - if: ${{ inputs.tutor-plugin-sources != '' }}
+      name: Install plugins
+      run: |
+        source venv/bin/activate
+        plugin_sources=${{ inputs.tutor-plugin-sources }}
+        for plugin_source in "${plugin_sources[@]}"; do
+          pip install $plugin_source
+        done
+      shell: bash
+
+    - if: ${{ inputs.tutor-plugin-names != '' }}
+      name: Enable plugins
+      run: |
+        source venv/bin/activate
+        plugin_names=${{ inputs.tutor-plugin-names }}
+        for plugin in "${plugin_names[@]}"; do
+          tutor plugins enable $plugin
+        done
+      shell: bash
+
     - name: Render Tutor Templates
+      shell: bash
       run: |
         source venv/bin/activate
         tutor config save
-      shell: bash
 
     - if: ${{ inputs.extra-private-requirements == 'true' }}
       name: Install extra requirements
@@ -164,6 +193,6 @@ runs:
         context: /home/runner/.local/share/tutor/${{ inputs.path-image-to-be-built }}
         push: true
         tags: "${{ inputs.repository-name }}/${{ inputs.image-name }}:${{ inputs.image-tag }}"
-        no-cache: ${{ inputs.no-docker-cache }}
+        no-cache: ${{ inputs.use-docker-cache == 'false' }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
