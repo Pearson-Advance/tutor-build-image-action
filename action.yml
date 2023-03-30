@@ -38,7 +38,6 @@ runs:
         git clone https://${{ inputs.gh-access-token }}@github.com/Pearson-Advance/tutor-ecommerce.git
         pip install -e ./tutor-ecommerce
         tutor plugins enable discovery ecommerce mfe
-        tutor local launch
         tutor config save
         tutor images build ecommerce
       shell: bash
