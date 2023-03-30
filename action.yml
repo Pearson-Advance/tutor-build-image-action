@@ -2,103 +2,23 @@ name: 'Composite Action'
 description: 'This workflow is able to build and push a specified Image from Tutor to Docker Hub.'
 
 inputs:
-  python-version:
-    description: 'The version of Python. It is useful since venv will be created from it. Defaults to 3.'
-    required: false
-    default: '3.8'
-  tutor-version:
-    description: 'The version of Tutor to be installed. Defaults to 15.3.0.'
-    required: true
-    default: '15.3.0'
-  repository-name:
-    description: 'The name of the repository created in Docker Hub in which the newly built image will be pushed and tagged.'
-    required: true
-  path-image-to-be-built:
-    description: 'Path (inside tutor root folder) to the folder containting the dockerfile. \
-                  For example: for ecommerce plugin /env/plugins/ecommerce/build/ecommerce. For edx-platform /env/build/openedx.'
-    required: true
-  image-name:
-    description: 'The tag of the image that will be pushed to Docker Hub. Defaults to latest. \
-                  It is important to use a correctly versioning (e.g., 1.0.0).'
-    required: true
-  image-tag:
-    description: 'Tag of the image that will be pushed to Docker Hub. It assigns latest by default.'
-    required: false
-    default: 'latest'
-  docker-username:
-    description: 'Docker Hub username.'
-    required: true
-  docker-token:
-    description: 'Docker Hub token.'
-    required: true
-  extra-private-requirements:
-    description: 'Bool input that indicates if It is necessary to install extra private requirements. Defaults to false.'
-    required: false
-    default: 'false'
-  theme-repository:
-    description: 'Repository that contains customized themes. \
-                  You have to indicate full URL path (e.g., https://github.com/Pearson-Advance/openedx-themes)'
-    required: false
-    default: ''
-  theme-branch:
-    description: 'Theme repository branch to be cloned (e.g., pearson-release/juniper.master). \
-                  It is necessary to specify the target branch if you decide to install theme repository. Otherwise no.'
-    required: false
-    default: ''
   gh-access-token:
     description: 'Personal Access Token (PAT). If you have not configured it yet, \
                   enter here https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) to see how create a PAT. \
                   When it is already configured, you can add it as a secrets for the repository. \
                   To see how create a secret enter https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository.'
     required: true
-  private-repositories:
-    description: 'Private repositories to be cloned. \
-                  It is an array that contains the name of each repository (e.g., ("pearson-core" "course_operations"))'
-    required: false
-  branches:
-    description: 'Branches is an array that contains the name of the different target branches to be cloned. \
-                  You have to be careful with this array and repositories array, because both should have the same length, \
-                  and correctly set the branch for each repository.'
-    required: false
-  use-docker-cache:
-    description: 'Determines whether to use caching during image building.'
-    required: false
-    default: 'false'
-  tutor-pearson-plugin-url:
-    description: 'Action environment variable to obtain the tutor pearson plugin URL from GitHub following
-                  https://docs.github.com/en/actions/learn-github-actions/variables#defining-configuration-variables-for-multiple-workflows.
-                  (e.g., "git+https://GH_TOKEN@github.com/Pearson-Advance/tutor-pearson-plugin.git")'
-    required: false
-    default: ''
-  tutor-plugin-sources:
-    description: 'Array containing the GitHub sources urls or the pypi package names of the plugins to install. Example: ("git+https://github.com/overhangio/tutor-ecommerce.git" "git+https://github.com/overhangio/tutor-mfe.git" "tutor-discovery")'
-    required: false
-    default: ''
-  tutor-plugin-names:
-    description: 'Array containing the names of the plugins to enable. Example: ("ecommerce" "discovery" "mfe")'
-    required: false
-    default: ''
+
 
 runs:
   using: "composite"
   steps:
     - uses: actions/checkout@v3
 
-    - name: Cache Tutor requirements
-      id: cache-pip
-      uses: actions/cache@v3
-      env:
-        cache-name: cache-pip-requirements
-      with:
-        path: ./venv
-        key: ${{ runner.os }}-${{ env.cache-name }}-requirements
-        restore-keys: |
-          ${{ runner.os }}-${{ env.cache-name }}
-
     - name: Setup Python
       uses: actions/setup-python@v4
       with:
-        python-version: ${{ inputs.python-version }}
+        python-version: '3.8'
 
     - name: Create and activate the env
       run: |
@@ -109,90 +29,18 @@ runs:
     - name: Install Tutor
       run: |
         source venv/bin/activate
-        python -m pip install tutor==${{ inputs.tutor-version }}
+        python -m pip install tutor==15.3.3
       shell: bash
 
-    - if: ${{ inputs.tutor-pearson-plugin-url != '' }}
-      name: Install the Tutor Pearson Plugin
-      shell: bash
+    - name: tutor ecommerce
       run: |
         source venv/bin/activate
-        function modify_tutor_pearson_plugin_url() {
-          local tutor_plugin_url=$1
-          local tutor_plugin_url_and_token=${tutor_plugin_url/GH_TOKEN/${{ inputs.gh-access-token }}}
-          echo $tutor_plugin_url_and_token
-        }
-        URL=${{ inputs.tutor-pearson-plugin-url }}
-        GH_TOKEN_URL=$(modify_tutor_pearson_plugin_url $URL)
-        pip install $GH_TOKEN_URL
-        tutor plugins enable pearson-plugin
-
-    - if: ${{ inputs.tutor-plugin-sources != '' }}
-      name: Install plugins
-      run: |
-        source venv/bin/activate
-        plugin_sources=${{ inputs.tutor-plugin-sources }}
-        for plugin_source in "${plugin_sources[@]}"; do
-          pip install $plugin_source
-        done
-      shell: bash
-
-    - if: ${{ inputs.tutor-plugin-names != '' }}
-      name: Enable plugins
-      run: |
-        source venv/bin/activate
-        plugin_names=${{ inputs.tutor-plugin-names }}
-        for plugin in "${plugin_names[@]}"; do
-          tutor plugins enable $plugin
-        done
-      shell: bash
-
-    - name: Render Tutor Templates
-      shell: bash
-      run: |
-        source venv/bin/activate
+        git clone https://${{ inputs.gh-access-token }}@github.com/Pearson-Advance/tutor-ecommerce.git
+        pip install -e ./tutor-ecommerce
+        tutor plugins enable discovery ecommerce mfe
+        tutor local launch
         tutor config save
-
-    - if: ${{ inputs.extra-private-requirements == 'true' }}
-      name: Install extra requirements
-      run: |
-        source venv/bin/activate
-        repositories=${{ inputs.private-repositories }} # It is an array that contains private repositories.
-        branches=${{ inputs.branches }} # branches has to be set in the same order as repositories.
-        COUNTER=0
-        for repository in "${repositories[@]}"; do
-          git clone -b ${branches[$COUNTER]} https://${{ inputs.gh-access-token }}@github.com/Pearson-Advance/$repository.git \
-            "$(tutor config printroot)/env/build/openedx/requirements/$repository"
-          echo "-e ./$repository" >> "$(tutor config printroot)/env/build/openedx/requirements/private.txt"
-          let COUNTER=COUNTER+1
-        done
+        tutor images build ecommerce
       shell: bash
 
-    - if: ${{ inputs.theme-repository != '' }}
-      name: Install themes
-      run: |
-        source venv/bin/activate
-        themes_path="$(tutor config printroot)/env/build/openedx/themes"
-        git clone -b ${{ inputs.theme-branch }} ${{ inputs.theme-repository }}
-        cd openedx-themes/edx-platform
-        mv * $themes_path # To compile our own themes, It is necessary move them to the directory created previously.
-      shell: bash
 
-    - name: Setup buildx
-      uses: docker/setup-buildx-action@v2
-
-    - name: Login to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ inputs.docker-username }}
-        password: ${{ inputs.docker-token }}
-
-    - name: Build and push
-      uses: docker/build-push-action@v4
-      with:
-        context: /home/runner/.local/share/tutor/${{ inputs.path-image-to-be-built }}
-        push: true
-        tags: "${{ inputs.repository-name }}/${{ inputs.image-name }}:${{ inputs.image-tag }}"
-        no-cache: ${{ inputs.use-docker-cache == 'false' }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
