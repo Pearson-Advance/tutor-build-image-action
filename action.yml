@@ -2,6 +2,12 @@ name: 'Composite Action'
 description: 'This workflow is able to build and push a specified Image from Tutor to Docker Hub.'
 
 inputs:
+  docker-username:
+    description: 'Docker Hub username.'
+    required: true
+  docker-token:
+    description: 'Docker Hub token.'
+    required: true
   gh-access-token:
     description: 'Personal Access Token (PAT). If you have not configured it yet, \
                   enter here https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) to see how create a PAT. \
@@ -39,7 +45,24 @@ runs:
         pip install -e ./tutor-ecommerce
         tutor plugins enable discovery ecommerce mfe
         tutor config save
-        tutor images build ecommerce
+        tutor images build ecommerce --build-arg --tag=pearsonopenedxops/tutor-ecommerce:latest
       shell: bash
 
+    - name: Setup buildx
+      uses: docker/setup-buildx-action@v2
 
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ inputs.docker-username }}
+        password: ${{ inputs.docker-token }}
+
+    - name: Build and push
+      uses: docker/build-push-action@v4
+      with:
+        context: /home/runner/.local/share/tutor/env/plugins/ecommerce/build/ecommerce/
+        push: true
+        tags: pearsonopenedxops/tutor-ecommerce:latest
+        no-cache: false
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
