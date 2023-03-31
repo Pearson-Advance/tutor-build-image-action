@@ -41,7 +41,7 @@ runs:
     - name: tutor ecommerce
       run: |
         source venv/bin/activate
-        git clone -b PADV-377.test https://github.com/Pearson-Advance/tutor-ecommerce.git
+        git clone -b vue/PADV-377.test https://github.com/Pearson-Advance/tutor-ecommerce.git
         pip install -e ./tutor-ecommerce
         tutor plugins enable discovery ecommerce mfe
         tutor config save
