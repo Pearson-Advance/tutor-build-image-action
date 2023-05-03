@@ -10,7 +10,7 @@ inputs:
     description: 'The version of Tutor to be installed. Defaults to 15.3.0.'
     required: true
     default: '15.3.0'
-  organization-name:
+  space-name:
     description: 'The name of the organization created in Docker Hub in which the newly built image will be pushed and tagged.'
     required: true
   repository-name:
@@ -112,7 +112,7 @@ runs:
 
     - name: Print
       run: |
-        echo "${{ inputs.organization-name }}/${{ inputs.repository-name }}:${{ inputs.image-tag }}"
+        echo "${{ inputs.space-name }}/${{ inputs.repository-name }}:${{ inputs.image-tag }}"
       shell: bash
 
     # - name: Install Tutor
