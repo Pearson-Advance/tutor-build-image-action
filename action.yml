@@ -112,7 +112,7 @@ runs:
 
     - name: Print
       run: |
-        echo "${{ inputs.space-name }}/${{ inputs.repository-name }}:${{ inputs.image-tag }}"
+        echo "${{ inputs.repository-name }}/${{ inputs.space-name }}:${{ inputs.image-tag }}"
       shell: bash
 
     # - name: Install Tutor
