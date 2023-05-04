@@ -36,10 +36,10 @@ inputs:
     required: false
     default: 'false'
   theme-repository:
-    description: 'Repository that contains customized themes. \
+    description: 'Repository that contains customized themes. The default is "false", which indicates that the functionality of the themes will not be used. \
                   You have to indicate full URL path (e.g., https://github.com/Pearson-Advance/openedx-themes)'
     required: false
-    default: ''
+    default: 'false'
   theme-branch:
     description: 'Theme repository branch to be cloned (e.g., pearson-release/juniper.master). \
                   It is necessary to specify the target branch if you decide to install theme repository. Otherwise no.'
@@ -172,7 +172,7 @@ runs:
         done
       shell: bash
 
-    - if: ${{ inputs.theme-repository != '' }}
+    - if: ${{ inputs.theme-repository != 'false' }}
       name: Install themes
       run: |
         source venv/bin/activate
