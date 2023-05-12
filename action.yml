@@ -191,10 +191,22 @@ runs:
         username: ${{ inputs.docker-username }}
         password: ${{ inputs.docker-token }}
 
+    - name: Set context path dynamically
+      run: |
+        if [[ "${{ inputs.path-image-to-be-built }}" != "openedx" ]]; then
+          echo "CONTEXT_PATH=/home/runner/.local/share/tutor/env/plugins/${{ inputs.path-image-to-be-built }}/build/{{ inputs.path-image-to-be-built }}" >> $GITHUB_ENV
+          echo "testing $CONTEXT_PATH"
+          echo "testing {{env.CONTEXT_PATH}}"
+        else
+          echo "CONTEXT_PATH=/home/runner/.local/share/tutor/${{ inputs.path-image-to-be-built }}" >> $GITHUB_ENV
+          echo "testing $CONTEXT_PATH"
+          echo "testing {{env.CONTEXT_PATH}}"
+        fi
+
     - name: Build and push
       uses: docker/build-push-action@v4
       with:
-        context: /home/runner/.local/share/tutor/${{ inputs.path-image-to-be-built }}
+        context: ${{ env.CONTEXT_PATH }}
         push: true
         tags: "${{ inputs.organization-name }}/${{ inputs.repository-name }}:${{ inputs.image-tag }}"
         no-cache: ${{ ! inputs.use-docker-cache }}
