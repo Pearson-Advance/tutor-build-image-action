@@ -197,6 +197,7 @@ runs:
         context: /home/runner/.local/share/tutor/${{ inputs.path-image-to-be-built }}
         push: true
         tags: "${{ inputs.organization-name }}/${{ inputs.repository-name }}:${{ inputs.image-tag }}"
-        no-cache: ${{ ! inputs.use-docker-cache }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+        # TO-DO: We will revisit this change after the Olive migration.
+        # no-cache: ${{ ! inputs.use-docker-cache }}
+        # cache-from: type=gha
+        # cache-to: type=gha,mode=max
