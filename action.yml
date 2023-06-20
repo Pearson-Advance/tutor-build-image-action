@@ -107,7 +107,7 @@ runs:
         python-version: ${{ inputs.python-version }}
 
     - name: Setup Tutor
-      uses: ./setup_tutor
+      uses: ./setup_tutor/
       with:
         python_version: ${{ inputs.python-version }}
         tutor_version: ${{ inputs.tutor-version }}
