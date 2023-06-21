@@ -113,7 +113,7 @@ runs:
         python-version: ${{ inputs.python-version }}
 
     - name: Setup Tutor
-      uses: tutor-build-image-action/setup_tutor/
+      uses: ./tutor-build-image-action/setup_tutor/
       with:
         python_version: ${{ inputs.python-version }}
         tutor_version: ${{ inputs.tutor-version }}
