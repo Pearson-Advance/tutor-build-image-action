@@ -95,7 +95,7 @@ runs:
         repository: Pearson-Advance/tutor-build-image-action
         ref: vue/PADV-329
         path: tutor-build-image-action
-        token: ${{ secrets.GH_PAT }}
+        token: ${{ inputs.gh-access-token }}
 
     - name: Cache Tutor requirements
       id: cache-pip
