@@ -11056,6 +11056,7 @@ const exec = __nccwpck_require__(2049);
 
 // exec options
 const options = {};
+var myOutput = "";
 var myError = "";
 options.listeners = {
   stdout: (data) => {

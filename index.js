@@ -10,6 +10,7 @@ const exec = require('@actions/exec');
 
 // exec options
 const options = {};
+var myOutput = "";
 var myError = "";
 options.listeners = {
   stdout: (data) => {
