@@ -45,7 +45,7 @@ inputs:
                   It is necessary to specify the target branch if you decide to install theme repository. Otherwise no.'
     required: false
     default: ''
-  gh_access-token:
+  gh_access_token:
     description: 'Personal Access Token (PAT). If you have not configured it yet, \
                   enter here https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) to see how create a PAT. \
                   When it is already configured, you can add it as a secrets for the repository. \
