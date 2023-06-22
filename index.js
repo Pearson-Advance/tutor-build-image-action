@@ -7,7 +7,7 @@ function parse_bash_array(arr) {
   var Arr = arr.substring(1, arr.length-1);
   Arr = Arr.split(" ");
   Arr = Arr.map(a => a.substring(1, a.length-1));
-  core.info(`Parsed bash array to parse: ${arr}`);
+  core.info(`Parsed bash array to parse: ${Arr}`);
   return Arr;
 }
 
@@ -82,6 +82,9 @@ async function run() {
         for (var i=0; i< repositories.length; i++) {
           let repository = repositories[i];
           let branch = branches_array[i];
+          if (repository == "") {
+            continue;
+          }
           await exec.exec(
             'git',
             [
