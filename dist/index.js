@@ -11044,15 +11044,18 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
-function parse_bash_array(arr) {
-    var arr = arr.substring(1, arr.length-1);
-    var Arr = arr.split(" ");
-    return Arr.map(a => a.substring(1, a.length-1));
-}
-
 const core = __nccwpck_require__(5127);
 const github = __nccwpck_require__(3134);
 const exec = __nccwpck_require__(2049);
+
+function parse_bash_array(arr) {
+  core.info(`Bash array to parse: ${arr}`);
+  var Arr = arr.substring(1, arr.length-1);
+  Arr = Arr.split(" ");
+  Arr = Arr.map(a => a.substring(1, a.length-1));
+  core.info(`Parsed bash array to parse: ${arr}`);
+  return Arr;
+}
 
 // exec options
 const options = {};

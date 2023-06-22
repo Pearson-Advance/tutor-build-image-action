@@ -1,12 +1,15 @@
-function parse_bash_array(arr) {
-    var arr = arr.substring(1, arr.length-1);
-    var Arr = arr.split(" ");
-    return Arr.map(a => a.substring(1, a.length-1));
-}
-
 const core = require('@actions/core');
 const github = require('@actions/github');
 const exec = require('@actions/exec');
+
+function parse_bash_array(arr) {
+  core.info(`Bash array to parse: ${arr}`);
+  var Arr = arr.substring(1, arr.length-1);
+  Arr = Arr.split(" ");
+  Arr = Arr.map(a => a.substring(1, a.length-1));
+  core.info(`Parsed bash array to parse: ${arr}`);
+  return Arr;
+}
 
 // exec options
 const options = {};
