@@ -11086,10 +11086,10 @@ const theme_repository  = core.getInput('theme_repository');
 const theme_branch  = core.getInput('theme_branch');
 
 async function run() {
-  try {
+
       // Create and activate virtualenv
       await exec.exec('python', ['-m', 'venv', 'venv'], options);
-      await exec.exec('source', ['venv/bin/activate'], options);
+      //await exec.exec('source', ['venv/bin/activate'], options);
       core.info('Virtualenv created');
 
       // Install Tutor
@@ -11161,11 +11161,6 @@ async function run() {
         await exec.exec('mv', ['openedx-themes/edx-platform/*', themes_path], options);
       }
 
-  } catch (error) {
-    console.log(myOutput);
-    console.log(myError);
-    core.setFailed(error.message);
-  }
 }
 
 run()
