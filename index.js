@@ -12,7 +12,9 @@ function parse_bash_array(arr) {
 }
 
 // exec options
-const options = {};
+const options = {
+  shell: '/bin/bash'
+};
 var myOutput = "";
 var myError = "";
 options.listeners = {
@@ -41,7 +43,7 @@ async function run() {
   try {
       // Create and activate virtualenv
       await exec.exec('python', ['-m', 'venv', 'venv'], options);
-      //await exec.exec('source', ['venv/bin/activate'], options);
+      await exec.exec('source', ['venv/bin/activate'], options);
       core.info('Virtualenv created');
 
       // Install Tutor
