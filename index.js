@@ -3,6 +3,9 @@ const github = require('@actions/github');
 const exec = require('@actions/exec');
 
 function parse_bash_array(arr) {
+  if (arr == "") {
+    return [];
+  }
   core.info(`Bash array to parse: ${arr}`);
   var Arr = arr.substring(1, arr.length-1);
   Arr = Arr.split(" ");
@@ -40,20 +43,21 @@ const theme_repository  = core.getInput('theme_repository');
 const theme_branch  = core.getInput('theme_branch');
 
 async function run() {
+  try {
 
       // Create and activate virtualenv
-      await exec.exec('python', ['-m', 'venv', 'venv'], options);
+      await exec.exec('python3', ['-m', 'venv', 'venv'], options);
       //await exec.exec('source', ['venv/bin/activate'], options);
       core.info('Virtualenv created');
 
       // Install Tutor
-      await exec.exec('python', ['-m', 'pip', 'install', `tutor==${tutor_version}`], options);
+      await exec.exec('venv/bin/python', ['-m', 'pip', 'install', `tutor==${tutor_version}`], options);
 
       // Install the Tutor Pearson Plugin
       if (tutor_pearson_plugin_url) {
           const gh_token_url = `${tutor_pearson_plugin_url}/GH_TOKEN/${gh_access_token}`;
-          await exec.exec('pip', ['install', gh_token_url], options);
-          await exec.exec('tutor', ['plugins', 'enable', tutor_pearson_plugin_name], options);
+          await exec.exec('venv/bin/pip', ['install', gh_token_url], options);
+          await exec.exec('venv/bin/tutor', ['plugins', 'enable', tutor_pearson_plugin_name], options);
       }
 
       // Install Tutor plugins
@@ -61,7 +65,7 @@ async function run() {
           const plugin_sources = parse_bash_array(tutor_plugin_sources);
           for (var i=0; i < plugin_sources.length; i++) {
               let plugin_source = plugin_sources[i];
-              await exec.exec('pip', ['install', plugin_source], options);
+              await exec.exec('venv/bin/pip', ['install', plugin_source], options);
           }
       }
 
@@ -70,12 +74,12 @@ async function run() {
         const plugin_names = parse_bash_array(tutor_plugin_names);
         for (var i=0; i < plugin_names.length; i++) {
             let plugin_name = plugin_names[i];
-            await exec.exec('tutor', ['plugins', 'enable', plugin_name], options);
+            await exec.exec('venv/bin/tutor', ['plugins', 'enable', plugin_name], options);
         }
       }
 
       // Render Tutor Templates
-      await exec.exec('tutor', ['config', 'save'], options);
+      await exec.exec('venv/bin/tutor', ['config', 'save'], options);
 
       // Install extra requirements
       if (extra_private_requirements) {
@@ -92,7 +96,7 @@ async function run() {
             [
               'clone', '-b', branch,
               `https://${gh_access_token}@github.com/Pearson-Advance/${repository}.git`,
-              `"$(tutor config printroot)/env/build/openedx/requirements/${repository}"`
+              `"$(venv/bin/tutor config printroot)/env/build/openedx/requirements/${repository}"`
             ],
             options
           );
@@ -101,7 +105,7 @@ async function run() {
             [
               `"-e ./${repository}"`,
               ">>",
-              '"$(tutor config printroot)/env/build/openedx/requirements/private.txt"'
+              '"$(venv/bin/tutor config printroot)/env/build/openedx/requirements/private.txt"'
             ],
             options
           );
@@ -110,10 +114,17 @@ async function run() {
 
       // Install themes
       if (theme_repository != 'false') {
-        const themes_path = '"$(tutor config printroot)/env/build/openedx/themes"';
+        const themes_path = '"$(venv/bin/tutor config printroot)/env/build/openedx/themes"';
         await exec.exec('git', ['clone', '-b', theme_branch, theme_repository], options);
         await exec.exec('mv', ['openedx-themes/edx-platform/*', themes_path], options);
       }
+  }
+  catch(error) {
+    //console.log(myError);
+    //console.log(myOutput);
+    console.log(error.message);
+    core.setFailed(error.message);
+  }
 
 }
 
