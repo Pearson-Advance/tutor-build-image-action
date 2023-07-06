@@ -11052,11 +11052,9 @@ function parse_bash_array(arr) {
   if (arr == "") {
     return [];
   }
-  core.info(`Bash array to parse: ${arr}`);
   var Arr = arr.substring(1, arr.length-1);
   Arr = Arr.split(" ");
   Arr = Arr.map(a => a.substring(1, a.length-1));
-  core.info(`Parsed bash array to parse: ${Arr}`);
   return Arr;
 }
 
@@ -11081,7 +11079,7 @@ const tutor_pearson_plugin_url = core.getInput('tutor_pearson_plugin-url');
 const gh_access_token = core.getInput('gh_access_token');
 const tutor_pearson_plugin_name = core.getInput('tutor_pearson_plugin_name');
 const tutor_plugin_sources = core.getInput('tutor_plugin_sources');
-const tutor_plugin_names = core.getInput('tutor-plugin-names');
+const tutor_plugin_names = core.getInput('tutor_plugin_names');
 const extra_private_requirements = core.getBooleanInput('extra_private_requirements');
 const private_repositories = core.getInput('private_repositories');
 const branches = core.getInput('branches');
@@ -11142,6 +11140,14 @@ async function run() {
             [
               'clone', '-b', branch,
               `https://${gh_access_token}@github.com/Pearson-Advance/${repository}.git`,
+              `"$(venv/bin/tutor config printroot)/env/build/openedx/requirements/${repository}"`
+            ],
+            options
+          );
+          await exec.exec(
+            'venv/bin/pip',
+            [
+              'install', '-e', 
               `"$(venv/bin/tutor config printroot)/env/build/openedx/requirements/${repository}"`
             ],
             options
