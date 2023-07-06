@@ -49,10 +49,12 @@ async function run() {
       core.info('Virtualenv created');
 
       // Install Tutor
+      core.info('Installing Tutor');
       await exec.exec('venv/bin/python', ['-m', 'pip', 'install', `tutor==${tutor_version}`], options);
 
       // Install the Tutor Pearson Plugin
       if (tutor_pearson_plugin_url) {
+          core.info('Installing Tutor Pearson plugin');
           const gh_token_url = `${tutor_pearson_plugin_url}/GH_TOKEN/${gh_access_token}`;
           await exec.exec('venv/bin/pip', ['install', gh_token_url], options);
           await exec.exec('venv/bin/tutor', ['plugins', 'enable', tutor_pearson_plugin_name], options);
@@ -60,24 +62,13 @@ async function run() {
 
       // Install Tutor plugins
       if (tutor_plugin_sources) {
+          core.info('Installing Tutor plugins');
           const plugin_sources = parse_bash_array(tutor_plugin_sources);
           for (var i=0; i < plugin_sources.length; i++) {
               let plugin_source = plugin_sources[i];
               await exec.exec('venv/bin/pip', ['install', plugin_source], options);
           }
       }
-
-      // Enable Tutor plugins
-      if (tutor_plugin_names) {
-        const plugin_names = parse_bash_array(tutor_plugin_names);
-        for (var i=0; i < plugin_names.length; i++) {
-            let plugin_name = plugin_names[i];
-            await exec.exec('venv/bin/tutor', ['plugins', 'enable', plugin_name], options);
-        }
-      }
-
-      // Render Tutor Templates
-      await exec.exec('venv/bin/tutor', ['config', 'save'], options);
 
       // Install extra requirements
       if (extra_private_requirements) {
@@ -117,6 +108,19 @@ async function run() {
           );
         }
       }
+
+      // Enable Tutor plugins
+      if (tutor_plugin_names) {
+        core.info('Installing Tutor plugins');
+        const plugin_names = parse_bash_array(tutor_plugin_names);
+        for (var i=0; i < plugin_names.length; i++) {
+            let plugin_name = plugin_names[i];
+            await exec.exec('venv/bin/tutor', ['plugins', 'enable', plugin_name], options);
+        }
+      }
+
+      // Render Tutor Templates
+      await exec.exec('venv/bin/tutor', ['config', 'save'], options);
 
       // Install themes
       if (theme_repository != 'false') {
