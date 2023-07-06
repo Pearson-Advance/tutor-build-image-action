@@ -11118,6 +11118,7 @@ async function run() {
 
       // Install extra requirements
       if (extra_private_requirements) {
+        core.info('Installing extra private requirements');
         const repositories = parse_bash_array(private_repositories);
         const branches_array = parse_bash_array(branches);
         for (var i=0; i< repositories.length; i++) {
@@ -11157,7 +11158,7 @@ async function run() {
 
       // Enable Tutor plugins
       if (tutor_plugin_names) {
-        core.info('Installing Tutor plugins');
+        core.info('Enabling Tutor plugins');
         const plugin_names = parse_bash_array(tutor_plugin_names);
         for (var i=0; i < plugin_names.length; i++) {
             let plugin_name = plugin_names[i];
