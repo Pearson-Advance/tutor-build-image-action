@@ -11148,6 +11148,14 @@ async function run() {
         }
       }
 
+      await exec.exec(
+        'cat', 
+        [
+          '"$(venv/bin/tutor config printroot)/env/build/openedx/requirements/private.txt"'
+        ],
+        options
+      );
+
       // Enable Tutor plugins
       if (tutor_plugin_names) {
         core.info('Enabling Tutor plugins');
