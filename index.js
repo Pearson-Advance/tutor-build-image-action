@@ -73,7 +73,7 @@ async function run() {
       await exec.exec(
         'touch', 
         [
-          '"$(venv/bin/tutor config printroot)/env/build/openedx/requirements/private.txt"'
+          '$(venv/bin/tutor config printroot)/env/build/openedx/requirements/private.txt'
         ],
         options
       );
@@ -113,7 +113,7 @@ async function run() {
       await exec.exec(
         'cat', 
         [
-          '"$(venv/bin/tutor config printroot)/env/build/openedx/requirements/private.txt"'
+          '$(venv/bin/tutor config printroot)/env/build/openedx/requirements/private.txt'
         ],
         options
       );
