@@ -93,9 +93,9 @@ async function run() {
           await exec.exec(
             'echo', 
             [
-              `"-e ./${repository}"`,
+              `-e ./${repository}`,
               ">>",
-              '"$(venv/bin/tutor config printroot)/env/build/openedx/requirements/private.txt"'
+              '$(venv/bin/tutor config printroot)/env/build/openedx/requirements/private.txt'
             ],
             options
           );
