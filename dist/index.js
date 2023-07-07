@@ -11137,14 +11137,6 @@ async function run() {
             options
           );
           await exec.exec(
-            'venv/bin/pip',
-            [
-              'install', '-e', 
-              `"$(venv/bin/tutor config printroot)/env/build/openedx/requirements/${repository}"`
-            ],
-            options
-          );
-          await exec.exec(
             'echo', 
             [
               `"-e ./${repository}"`,

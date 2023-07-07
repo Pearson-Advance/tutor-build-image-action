@@ -91,14 +91,6 @@ async function run() {
             options
           );
           await exec.exec(
-            'venv/bin/pip',
-            [
-              'install', '-e', 
-              `"$(venv/bin/tutor config printroot)/env/build/openedx/requirements/${repository}"`
-            ],
-            options
-          );
-          await exec.exec(
             'echo', 
             [
               `"-e ./${repository}"`,
@@ -109,6 +101,14 @@ async function run() {
           );
         }
       }
+
+      await exec.exec(
+        'cat', 
+        [
+          '"$(venv/bin/tutor config printroot)/env/build/openedx/requirements/private.txt"'
+        ],
+        options
+      );
 
       // Enable Tutor plugins
       if (tutor_plugin_names) {
