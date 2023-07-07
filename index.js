@@ -70,6 +70,14 @@ async function run() {
           }
       }
 
+      await exec.exec(
+        'touch', 
+        [
+          '"$(venv/bin/tutor config printroot)/env/build/openedx/requirements/private.txt"'
+        ],
+        options
+      );
+
       // Install extra requirements
       if (extra_private_requirements) {
         core.info('Installing extra private requirements');
