@@ -11136,7 +11136,7 @@ async function run() {
       core.info(`tutor_root: ${tutor_root}`);
 
       // Create private.txt file
-      //fs.closeSync(fs.openSync(`${tutor_root}/env/build/openedx/requirements/private.txt`, 'w'));
+      await exec.exec('ls', [`${tutor_root}/env/build/openedx/requirements/`], options);
       await exec.exec('touch', [`${tutor_root}/env/build/openedx/requirements/private.txt`], options);
 
       // Install extra requirements
