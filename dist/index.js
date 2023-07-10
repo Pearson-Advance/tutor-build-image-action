@@ -11116,13 +11116,19 @@ async function run() {
           }
       }
 
-      await exec.exec(
-        'touch', 
-        [
-          '$(venv/bin/tutor config printroot)/env/build/openedx/requirements/private.txt'
-        ],
-        options
-      );
+      var tutor_root = "";
+      var tutor_root_options = options;
+      tutor_root_options.listeners = {
+        stdout: (data) => {
+          tutor_root += data.toString();
+        },
+        stderr: (data) => {
+          myError += data.toString();
+        }
+      };
+
+      await exec.exec('venv/bin/tutor', ['config', 'printroot'], options);
+      core.info(`tutor_root: ${tutor_root}`);
 
       // Install extra requirements
       if (extra_private_requirements) {
@@ -11140,7 +11146,7 @@ async function run() {
             [
               'clone', '-b', branch,
               `https://${gh_access_token}@github.com/Pearson-Advance/${repository}.git`,
-              `"$(venv/bin/tutor config printroot)/env/build/openedx/requirements/${repository}"`
+              `${tutor_root}/env/build/openedx/requirements/${repository}`
             ],
             options
           );
@@ -11149,7 +11155,7 @@ async function run() {
             [
               `-e ./${repository}`,
               ">>",
-              '$(venv/bin/tutor config printroot)/env/build/openedx/requirements/private.txt'
+              `${tutor_root}/env/build/openedx/requirements/private.txt`
             ],
             options
           );
@@ -11159,7 +11165,7 @@ async function run() {
       await exec.exec(
         'cat', 
         [
-          '$(venv/bin/tutor config printroot)/env/build/openedx/requirements/private.txt'
+          `${tutor_root}/env/build/openedx/requirements/private.txt`
         ],
         options
       );
