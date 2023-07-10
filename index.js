@@ -116,6 +116,10 @@ async function run() {
             ],
             options
           );
+          await exec.exec(
+            `echo "-e ./${repository}" >> "${tutor_root}/env/build/openedx/requirements/private.txt"`, 
+            [], options
+          );
         }
       }
 
