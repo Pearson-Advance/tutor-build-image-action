@@ -71,7 +71,9 @@ async function run() {
       }
 
       var tutor_root = "";
-      var tutor_root_options = options;
+      var tutor_root_options = {
+        shell: '/bin/bash'
+      };
       tutor_root_options.listeners = {
         stdout: (data) => {
           tutor_root += data.toString();
@@ -81,7 +83,7 @@ async function run() {
         }
       };
 
-      await exec.exec('venv/bin/tutor', ['config', 'printroot'], options);
+      await exec.exec('venv/bin/tutor', ['config', 'printroot'], tutor_root_options);
       core.info(`tutor_root: ${tutor_root}`);
 
       // Install extra requirements
