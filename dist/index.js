@@ -11136,7 +11136,11 @@ async function run() {
       core.info(`tutor_root: ${tutor_root}`);
 
       // Create private.txt file
-      await exec.exec('ls', [tutor_root], options);
+      await exec.exec('ls', ['/home/'], options);
+      await exec.exec('ls', ['/home/runner/'], options);
+      await exec.exec('ls', ['/home/runner/.local/'], options);
+      await exec.exec('ls', ['/home/runner/.local/share/'], options);
+      await exec.exec('ls', [`${tutor_root}"`], options);
       await exec.exec('ls', [`${tutor_root}/env/`], options);
       await exec.exec('ls', [`${tutor_root}/env/build/`], options);
       await exec.exec('ls', [`${tutor_root}/env/build/openedx/`], options);
