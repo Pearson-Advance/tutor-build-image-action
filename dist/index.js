@@ -11048,6 +11048,8 @@ const core = __nccwpck_require__(5127);
 const github = __nccwpck_require__(3134);
 const exec = __nccwpck_require__(2049);
 
+const fs = __nccwpck_require__(7147);
+
 function parse_bash_array(arr) {
   if (arr == "") {
     return [];
@@ -11133,6 +11135,9 @@ async function run() {
       tutor_root = tutor_root.trim();
       core.info(`tutor_root: ${tutor_root}`);
 
+      // Create private.txt file
+      fs.closeSync(fs.openSync(`${tutor_root}/env/build/openedx/requirements/${repository}`, 'w'));
+
       // Install extra requirements
       if (extra_private_requirements) {
         core.info('Installing extra private requirements');
@@ -11153,19 +11158,9 @@ async function run() {
             ],
             options
           );
-          await exec.exec(
-            'echo', 
-            [
-              `-e ./${repository}`,
-              ">>",
-              `${tutor_root}/env/build/openedx/requirements/private.txt`
-            ],
-            options
-          );
-          await exec.exec(
-            `echo "-e ./${repository}" >> "${tutor_root}/env/build/openedx/requirements/private.txt"`, 
-            [], options
-          );
+
+          // Write requirement to the private.txt file
+          fs.writeFileSync(`${tutor_root}/env/build/openedx/requirements/${repository}`, `-e ./${repository}`);
         }
       }
 
