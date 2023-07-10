@@ -84,6 +84,7 @@ async function run() {
       };
 
       await exec.exec('venv/bin/tutor', ['config', 'printroot'], tutor_root_options);
+      tutor_root = tutor_root.trim();
       core.info(`tutor_root: ${tutor_root}`);
 
       // Install extra requirements
