@@ -85,8 +85,6 @@ async function run() {
         }
       };
 
-      await exec.exec('venv/bin/tutor', ['config', 'save'], options);
-
       await exec.exec('venv/bin/tutor', ['config', 'printroot'], tutor_root_options);
       tutor_root = tutor_root.trim();
       core.info(`tutor_root: ${tutor_root}`);
@@ -94,15 +92,6 @@ async function run() {
       await exec.exec('sudo chmod', ['-R', '777', tutor_root], tutor_root_options);
 
       // Create private.txt file
-      await exec.exec('ls', ['/home/'], options);
-      await exec.exec('ls', ['/home/runner/'], options);
-      await exec.exec('ls', ['/home/runner/.local/'], options);
-      await exec.exec('ls', ['/home/runner/.local/share/'], options);
-      await exec.exec('ls', [`${tutor_root}`], options);
-      await exec.exec('ls', [`${tutor_root}/env/`], options);
-      await exec.exec('ls', [`${tutor_root}/env/build/`], options);
-      await exec.exec('ls', [`${tutor_root}/env/build/openedx/`], options);
-      await exec.exec('ls', [`${tutor_root}/env/build/openedx/requirements/`], options);
       await exec.exec('touch', [`${tutor_root}/env/build/openedx/requirements/private.txt`], options);
 
       // Install extra requirements
@@ -127,7 +116,7 @@ async function run() {
           );
 
           // Write requirement to the private.txt file
-          fs.writeFileSync(`${tutor_root}/env/build/openedx/requirements/private.txt`, `-e ./${repository}`);
+          fs.appendFileSync(`${tutor_root}/env/build/openedx/requirements/private.txt`, `-e ./${repository}\n`);
         }
       }
 
