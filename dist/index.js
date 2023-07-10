@@ -11137,7 +11137,7 @@ async function run() {
       tutor_root = tutor_root.trim();
       core.info(`tutor_root: ${tutor_root}`);
 
-      await exec.exec('chmod', ['-R', '777', tutor_root], tutor_root_options);
+      await exec.exec('sudo chmod', ['-R', '777', tutor_root], tutor_root_options);
 
       // Create private.txt file
       await exec.exec('ls', ['/home/'], options);
