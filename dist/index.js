@@ -11136,6 +11136,10 @@ async function run() {
       core.info(`tutor_root: ${tutor_root}`);
 
       // Create private.txt file
+      await exec.exec('ls', [tutor_root], options);
+      await exec.exec('ls', [`${tutor_root}/env/`], options);
+      await exec.exec('ls', [`${tutor_root}/env/build/`], options);
+      await exec.exec('ls', [`${tutor_root}/env/build/openedx/`], options);
       await exec.exec('ls', [`${tutor_root}/env/build/openedx/requirements/`], options);
       await exec.exec('touch', [`${tutor_root}/env/build/openedx/requirements/private.txt`], options);
 
