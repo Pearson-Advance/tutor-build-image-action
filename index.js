@@ -90,7 +90,7 @@ async function run() {
       core.info(`tutor_root: ${tutor_root}`);
 
       // Create private.txt file
-      fs.closeSync(fs.openSync(`${tutor_root}/env/build/openedx/requirements/${repository}`, 'w'));
+      fs.closeSync(fs.openSync(`${tutor_root}/env/build/openedx/requirements/private.txt`, 'w'));
 
       // Install extra requirements
       if (extra_private_requirements) {
@@ -114,7 +114,7 @@ async function run() {
           );
 
           // Write requirement to the private.txt file
-          fs.writeFileSync(`${tutor_root}/env/build/openedx/requirements/${repository}`, `-e ./${repository}`);
+          fs.writeFileSync(`${tutor_root}/env/build/openedx/requirements/private.txt`, `-e ./${repository}`);
         }
       }
 
