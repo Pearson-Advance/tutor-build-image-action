@@ -31,7 +31,7 @@ options.listeners = {
 
 // Reading inputs
 const tutor_version = core.getInput('tutor_version');
-const tutor_pearson_plugin_url = core.getInput('tutor_pearson_plugin-url');
+const tutor_pearson_plugin_url = core.getInput('tutor_pearson_plugin_url');
 const gh_access_token = core.getInput('gh_access_token');
 const tutor_pearson_plugin_name = core.getInput('tutor_pearson_plugin_name');
 const tutor_plugin_sources = core.getInput('tutor_plugin_sources');
