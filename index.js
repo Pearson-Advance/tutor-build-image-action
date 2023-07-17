@@ -145,7 +145,7 @@ async function run() {
 
       // Install themes
       if (theme_repository != 'false') {
-        const themes_path = '"$(venv/bin/tutor config printroot)/env/build/openedx/themes"';
+        const themes_path = `${tutor_root}/env/build/openedx/themes`;
         await exec.exec('git', ['clone', '-b', theme_branch, theme_repository], options);
         await exec.exec('mv', ['openedx-themes/edx-platform/*', themes_path], options);
       }
