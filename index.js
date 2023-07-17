@@ -1,5 +1,4 @@
 const core = require('@actions/core');
-const github = require('@actions/github');
 const exec = require('@actions/exec');
 
 const fs = require('fs');
@@ -145,9 +144,17 @@ async function run() {
 
       // Install themes
       if (theme_repository != 'false') {
-        const themes_path = `${tutor_root}/env/build/openedx/themes`;
+        const themes_path = `${tutor_root}/env/build/openedx/themes/`;
         await exec.exec('git', ['clone', '-b', theme_branch, theme_repository], options);
-        await exec.exec('mv', ['openedx-themes/edx-platform/*', themes_path], options);
+        
+        const to_move = fs.readdirSync('openedx-themes/edx-platform/');
+
+        for (var i = to_move.length - 1; i >= 0; i--) {
+          var file = to_move[i];
+          fs.renameSync('openedx-themes/edx-platform/' + file, themes_path + file);
+        }
+
+        //await exec.exec('mv', ['openedx-themes/edx-platform/*', themes_path], options);
       }
   }
   catch(error) {
