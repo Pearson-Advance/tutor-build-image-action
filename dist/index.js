@@ -4129,6 +4129,8 @@ const private_repositories = core.getInput('private_repositories');
 const branches = core.getInput('branches');
 const theme_repository  = core.getInput('theme_repository');
 const theme_branch  = core.getInput('theme_branch');
+const service  = core.getInput('service');
+const environment  = core.getInput('environment');
 
 async function run() {
   try {
@@ -4149,6 +4151,15 @@ async function run() {
           const gh_token_url = tutor_pearson_plugin_url.replace("GH_TOKEN", gh_access_token);
           await exec.exec('venv/bin/pip', ['install', gh_token_url], options);
           await exec.exec('venv/bin/tutor', ['plugins', 'enable', tutor_pearson_plugin_name], options);
+      }
+
+      if (environment && service == "openedx") {
+        const to_enable = [
+          `pearson-plugin-mfe-${environment}`, `pearson-plugin-edxapp-${environment}`,
+          `pearson-plugin-discovery-${environment}`, `pearson-plugin-ecommerce-${environment}`
+        ];
+
+        await exec.exec('venv/bin/tutor', ['plugins', 'enable', to_enable.join(" ")], options);
       }
 
       // Install Tutor plugins
@@ -4178,8 +4189,6 @@ async function run() {
       await exec.exec('venv/bin/tutor', ['config', 'printroot'], tutor_root_options);
       tutor_root = tutor_root.trim();
       core.info(`tutor_root: ${tutor_root}`);
-
-      //await exec.exec('sudo chmod', ['-R', '777', tutor_root], tutor_root_options);
 
       // Create private.txt file
       await exec.exec('touch', [`${tutor_root}/env/build/openedx/requirements/private.txt`], options);
