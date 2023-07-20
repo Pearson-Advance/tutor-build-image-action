@@ -64,15 +64,6 @@ async function run() {
           await exec.exec('venv/bin/tutor', ['plugins', 'enable', tutor_pearson_plugin_name], options);
       }
 
-      if (environment && service == "openedx") {
-        const to_enable = [
-          `pearson-plugin-mfe-${environment}`, `pearson-plugin-edxapp-${environment}`,
-          `pearson-plugin-discovery-${environment}`, `pearson-plugin-ecommerce-${environment}`
-        ];
-
-        await exec.exec('venv/bin/tutor', ['plugins', 'enable', to_enable.join(" ")], options);
-      }
-
       // Install Tutor plugins
       if (tutor_plugin_sources) {
           core.info('Installing Tutor plugins');
@@ -146,6 +137,15 @@ async function run() {
             let plugin_name = plugin_names[i];
             await exec.exec('venv/bin/tutor', ['plugins', 'enable', plugin_name], options);
         }
+      }
+
+      if (environment && service == "openedx") {
+        const to_enable = [
+          `pearson-plugin-mfe-${environment}`, `pearson-plugin-edxapp-${environment}`,
+          `pearson-plugin-discovery-${environment}`, `pearson-plugin-ecommerce-${environment}`
+        ];
+
+        await exec.exec('venv/bin/tutor', ['plugins', 'enable', to_enable.join(" ")], options);
       }
 
       // Render Tutor Templates
