@@ -4233,8 +4233,11 @@ async function run() {
           `pearson-plugin-mfe-${environment}`, `pearson-plugin-edxapp-${environment}`,
           `pearson-plugin-discovery-${environment}`, `pearson-plugin-ecommerce-${environment}`
         ];
-
-        await exec.exec('venv/bin/tutor', ['plugins', 'enable', to_enable.join(" ")], options);
+        
+        for (var i=0; i < to_enable.length; i++) {
+          const plugin_name = to_enable[i];
+          await exec.exec('venv/bin/tutor', ['plugins', 'enable', plugin_name], options);
+        }
       }
 
       // Render Tutor Templates
