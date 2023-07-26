@@ -2,35 +2,10 @@ name: 'Setup Tutor'
 description: 'This workflow is able to install and configure Tutor.'
 
 inputs:
-  python_version:
-    description: 'The version of Python. It is useful since venv will be created from it. Defaults to 3.'
-    required: false
-    default: '3.8'
   tutor_version:
     description: 'The version of Tutor to be installed. Defaults to 15.3.0.'
     required: true
     default: '15.3.0'
-  organization_name:
-    description: 'The name of the organization created in Docker Hub in which the newly built image will be pushed and tagged.'
-    required: true
-  repository_name:
-    description: 'The name of the repository created in Docker Hub in which the newly built image will be pushed and tagged.'
-    required: true
-  image_tag:
-    description: 'Tag of the image that will be pushed to Docker Hub. It assigns latest by default. \
-                  It is important to use a correctly versioning (e.g., 1.0.0).'
-    required: false
-    default: 'latest'
-  path_image_to_be_built:
-    description: 'Path (inside tutor root folder) to the folder containting the dockerfile. \
-                  For example: for ecommerce plugin /env/plugins/ecommerce/build/ecommerce. For edx-platform /env/build/openedx.'
-    required: true
-  docker_username:
-    description: 'Docker Hub username.'
-    required: true
-  docker_token:
-    description: 'Docker Hub token.'
-    required: true
   extra_private_requirements:
     description: 'Bool input that indicates if It is necessary to install extra private requirements. Defaults to false.'
     required: false
@@ -60,10 +35,6 @@ inputs:
                   You have to be careful with this array and repositories array, because both should have the same length, \
                   and correctly set the branch for each repository.'
     required: false
-  use_docker_cache:
-    description: 'Determines whether to use caching during image building.'
-    required: false
-    default: 'false'
   tutor_pearson_plugin_url:
     description: 'Action environment variable to obtain the tutor pearson plugin URL from GitHub following
                   https://docs.github.com/en/actions/learn-github-actions/variables#defining-configuration-variables-for-multiple-workflows.
