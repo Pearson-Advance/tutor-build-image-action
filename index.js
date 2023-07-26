@@ -32,7 +32,7 @@ options.listeners = {
 const tutor_version = core.getInput('tutor_version');
 const tutor_pearson_plugin_url = core.getInput('tutor_pearson_plugin_url');
 const gh_access_token = core.getInput('gh_access_token');
-const tutor_pearson_plugin_name = core.getInput('tutor_pearson_plugin_name');
+const tutor_pearson_plugins = core.getInput('tutor_pearson_plugin_name');
 const tutor_plugin_sources = core.getInput('tutor_plugin_sources');
 const tutor_plugin_names = core.getInput('tutor_plugin_names');
 const extra_private_requirements = core.getBooleanInput('extra_private_requirements');
@@ -40,8 +40,8 @@ const private_repositories = core.getInput('private_repositories');
 const branches = core.getInput('branches');
 const theme_repository  = core.getInput('theme_repository');
 const theme_branch  = core.getInput('theme_branch');
-const service  = core.getInput('service');
-const environment  = core.getInput('environment');
+//const service  = core.getInput('service');
+//const environment  = core.getInput('environment');
 
 async function run() {
   try {
@@ -61,7 +61,7 @@ async function run() {
           //const gh_token_url = `${tutor_pearson_plugin_url}/GH_TOKEN/${gh_access_token}`;
           const gh_token_url = tutor_pearson_plugin_url.replace("GH_TOKEN", gh_access_token);
           await exec.exec('venv/bin/pip', ['install', gh_token_url], options);
-          await exec.exec('venv/bin/tutor', ['plugins', 'enable', tutor_pearson_plugin_name], options);
+          //await exec.exec('venv/bin/tutor', ['plugins', 'enable', tutor_pearson_plugin_name], options);
       }
 
       // Install Tutor plugins
@@ -139,11 +139,8 @@ async function run() {
         }
       }
 
-      if (environment && service == "openedx") {
-        const to_enable = [
-          `pearson-plugin-mfe-${environment}`, `pearson-plugin-edxapp-${environment}`,
-          `pearson-plugin-discovery-${environment}`, `pearson-plugin-ecommerce-${environment}`
-        ];
+      if (tutor_pearson_plugins) {
+        const to_enable = parse_bash_array(tutor_pearson_plugins);
         
         for (var i=0; i < to_enable.length; i++) {
           const plugin_name = to_enable[i];
