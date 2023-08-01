@@ -4093,7 +4093,7 @@ const exec = __nccwpck_require__(49);
 const fs = __nccwpck_require__(147);
 
 function parse_bash_array(arr) {
-  if (arr == "") {
+  if (!arr || arr == "()" || arr == "false") {
     return [];
   }
   var Arr = arr.substring(1, arr.length-1);
