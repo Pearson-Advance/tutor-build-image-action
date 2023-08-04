@@ -40,15 +40,12 @@ const private_repositories = core.getInput('private_repositories');
 const branches = core.getInput('branches');
 const theme_repository  = core.getInput('theme_repository');
 const theme_branch  = core.getInput('theme_branch');
-//const service  = core.getInput('service');
-//const environment  = core.getInput('environment');
 
 async function run() {
   try {
 
       // Create and activate virtualenv
       await exec.exec('python3', ['-m', 'venv', 'venv'], options);
-      //await exec.exec('source', ['venv/bin/activate'], options);
       core.info('Virtualenv created');
 
       // Install Tutor
@@ -58,10 +55,8 @@ async function run() {
       // Install the Tutor Pearson Plugin
       if (tutor_pearson_plugin_url) {
           core.info('Installing Tutor Pearson plugin');
-          //const gh_token_url = `${tutor_pearson_plugin_url}/GH_TOKEN/${gh_access_token}`;
           const gh_token_url = tutor_pearson_plugin_url.replace("GH_TOKEN", gh_access_token);
           await exec.exec('venv/bin/pip', ['install', gh_token_url], options);
-          //await exec.exec('venv/bin/tutor', ['plugins', 'enable', tutor_pearson_plugin_name], options);
       }
 
       // Install Tutor plugins
@@ -162,13 +157,9 @@ async function run() {
           var file = to_move[i];
           fs.renameSync('openedx-themes/edx-platform/' + file, themes_path + file);
         }
-
-        //await exec.exec('mv', ['openedx-themes/edx-platform/*', themes_path], options);
       }
   }
   catch(error) {
-    //console.log(myError);
-    //console.log(myOutput);
     console.log(error.message);
     core.setFailed(error.message);
   }
