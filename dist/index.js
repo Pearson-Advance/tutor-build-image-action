@@ -4092,6 +4092,11 @@ const exec = __nccwpck_require__(49);
 
 const fs = __nccwpck_require__(147);
 
+/**
+ * Parses a string containing an array of strings in the bash syntax.
+ * @param  {String} arr Bash array as a string. Example: ("abc" "def")
+ * @return {[type]}     Parsed array.
+ */
 function parse_bash_array(arr) {
   if (!arr || arr == "()" || arr == "false") {
     return [];
@@ -4106,6 +4111,8 @@ function parse_bash_array(arr) {
 const options = {
   shell: '/bin/bash'
 };
+
+// Standard out and standard error will be written to these variables
 var myOutput = "";
 var myError = "";
 options.listeners = {
@@ -4129,15 +4136,12 @@ const private_repositories = core.getInput('private_repositories');
 const branches = core.getInput('branches');
 const theme_repository  = core.getInput('theme_repository');
 const theme_branch  = core.getInput('theme_branch');
-//const service  = core.getInput('service');
-//const environment  = core.getInput('environment');
 
 async function run() {
   try {
 
       // Create and activate virtualenv
       await exec.exec('python3', ['-m', 'venv', 'venv'], options);
-      //await exec.exec('source', ['venv/bin/activate'], options);
       core.info('Virtualenv created');
 
       // Install Tutor
@@ -4147,10 +4151,8 @@ async function run() {
       // Install the Tutor Pearson Plugin
       if (tutor_pearson_plugin_url) {
           core.info('Installing Tutor Pearson plugin');
-          //const gh_token_url = `${tutor_pearson_plugin_url}/GH_TOKEN/${gh_access_token}`;
           const gh_token_url = tutor_pearson_plugin_url.replace("GH_TOKEN", gh_access_token);
           await exec.exec('venv/bin/pip', ['install', gh_token_url], options);
-          //await exec.exec('venv/bin/tutor', ['plugins', 'enable', tutor_pearson_plugin_name], options);
       }
 
       // Install Tutor plugins
@@ -4163,6 +4165,7 @@ async function run() {
           }
       }
 
+      // Path to the tutor root will be saved in this variable
       var tutor_root = "";
       var tutor_root_options = {
         shell: '/bin/bash'
@@ -4177,6 +4180,8 @@ async function run() {
       };
 
       await exec.exec('venv/bin/tutor', ['config', 'save'], options);
+
+      // Running 'tutor config printroot' and saving the output to a variable
       await exec.exec('venv/bin/tutor', ['config', 'printroot'], tutor_root_options);
       tutor_root = tutor_root.trim();
       core.info(`tutor_root: ${tutor_root}`);
@@ -4210,15 +4215,7 @@ async function run() {
         }
       }
 
-      await exec.exec(
-        'cat', 
-        [
-          `${tutor_root}/env/build/openedx/requirements/private.txt`
-        ],
-        options
-      );
-
-      // Enable Tutor plugins
+      // Enable Tutor plugins (global)
       if (tutor_plugin_names) {
         core.info('Enabling Tutor plugins');
         const plugin_names = parse_bash_array(tutor_plugin_names);
@@ -4228,6 +4225,7 @@ async function run() {
         }
       }
 
+      // Enable Tutor plugins (from tutor pearson plugin, according to service and environment)
       if (tutor_pearson_plugins) {
         const to_enable = parse_bash_array(tutor_pearson_plugins);
         
@@ -4244,20 +4242,23 @@ async function run() {
       if (theme_repository != 'false') {
         const themes_path = `${tutor_root}/env/build/openedx/themes/`;
         await exec.exec('git', ['clone', '-b', theme_branch, theme_repository], options);
-        
-        const to_move = fs.readdirSync('openedx-themes/edx-platform/');
 
+        var to_move;
+        if (fs.existsSync(themes_path)) {
+          to_move = fs.readdirSync('openedx-themes/edx-platform/');
+        }
+        else {
+          to_move = [];
+        }
+  
         for (var i = to_move.length - 1; i >= 0; i--) {
           var file = to_move[i];
           fs.renameSync('openedx-themes/edx-platform/' + file, themes_path + file);
         }
 
-        //await exec.exec('mv', ['openedx-themes/edx-platform/*', themes_path], options);
       }
   }
   catch(error) {
-    //console.log(myError);
-    //console.log(myOutput);
     console.log(error.message);
     core.setFailed(error.message);
   }

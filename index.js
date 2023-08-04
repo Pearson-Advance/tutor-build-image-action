@@ -153,13 +153,20 @@ async function run() {
       if (theme_repository != 'false') {
         const themes_path = `${tutor_root}/env/build/openedx/themes/`;
         await exec.exec('git', ['clone', '-b', theme_branch, theme_repository], options);
-        
-        const to_move = fs.readdirSync('openedx-themes/edx-platform/');
 
+        var to_move;
+        if (fs.existsSync(themes_path)) {
+          to_move = fs.readdirSync('openedx-themes/edx-platform/');
+        }
+        else {
+          to_move = [];
+        }
+  
         for (var i = to_move.length - 1; i >= 0; i--) {
           var file = to_move[i];
           fs.renameSync('openedx-themes/edx-platform/' + file, themes_path + file);
         }
+
       }
   }
   catch(error) {
