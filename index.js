@@ -3,6 +3,11 @@ const exec = require('@actions/exec');
 
 const fs = require('fs');
 
+/**
+ * Parses a string containing an array of strings in the bash syntax.
+ * @param  {String} arr Bash array as a string. Example: ("abc" "def")
+ * @return {[type]}     Parsed array.
+ */
 function parse_bash_array(arr) {
   if (!arr || arr == "()" || arr == "false") {
     return [];
@@ -17,6 +22,8 @@ function parse_bash_array(arr) {
 const options = {
   shell: '/bin/bash'
 };
+
+// Standard out and standard error will be written to these variables
 var myOutput = "";
 var myError = "";
 options.listeners = {
@@ -69,6 +76,7 @@ async function run() {
           }
       }
 
+      // Path to the tutor root will be saved in this variable
       var tutor_root = "";
       var tutor_root_options = {
         shell: '/bin/bash'
@@ -83,6 +91,8 @@ async function run() {
       };
 
       await exec.exec('venv/bin/tutor', ['config', 'save'], options);
+
+      // Running 'tutor config printroot' and saving the output to a variable
       await exec.exec('venv/bin/tutor', ['config', 'printroot'], tutor_root_options);
       tutor_root = tutor_root.trim();
       core.info(`tutor_root: ${tutor_root}`);
@@ -116,15 +126,7 @@ async function run() {
         }
       }
 
-      await exec.exec(
-        'cat', 
-        [
-          `${tutor_root}/env/build/openedx/requirements/private.txt`
-        ],
-        options
-      );
-
-      // Enable Tutor plugins
+      // Enable Tutor plugins (global)
       if (tutor_plugin_names) {
         core.info('Enabling Tutor plugins');
         const plugin_names = parse_bash_array(tutor_plugin_names);
@@ -134,6 +136,7 @@ async function run() {
         }
       }
 
+      // Enable Tutor plugins (from tutor pearson plugin, according to service and environment)
       if (tutor_pearson_plugins) {
         const to_enable = parse_bash_array(tutor_pearson_plugins);
         
