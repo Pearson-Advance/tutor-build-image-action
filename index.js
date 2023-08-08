@@ -128,10 +128,9 @@ async function run() {
       // Enable Tutor plugins (global)
       if (tutor_plugin_names) {
         core.info('Enabling Tutor plugins.');
-        const plugin_names = parse_bash_array(tutor_plugin_names);
-        for (var i=0; i < plugin_names.length; i++) {
-            let plugin_name = plugin_names[i];
-            await exec.exec('venv/bin/tutor', ['plugins', 'enable', plugin_name], options);
+        const plugins = parse_bash_array(tutor_plugin_names);
+        for (var i=0; i < plugins.length; i++) {
+            await exec.exec('venv/bin/tutor', ['plugins', 'enable', plugins[i]], options);
         }
       }
 
