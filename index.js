@@ -127,7 +127,7 @@ async function run() {
 
       // Enable Tutor plugins (global)
       if (tutor_plugin_names) {
-        core.info('Enabling Tutor plugins');
+        core.info('Enabling Tutor plugins.');
         const plugin_names = parse_bash_array(tutor_plugin_names);
         for (var i=0; i < plugin_names.length; i++) {
             let plugin_name = plugin_names[i];
