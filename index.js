@@ -71,8 +71,7 @@ async function run() {
           core.info('Installing Tutor plugins');
           const plugin_sources = parse_bash_array(tutor_plugin_sources);
           for (var i=0; i < plugin_sources.length; i++) {
-              let plugin_source = plugin_sources[i];
-              await exec.exec('venv/bin/pip', ['install', plugin_source], options);
+              await exec.exec('venv/bin/pip', ['install',  plugin_sources[i]], options);
           }
       }
 
