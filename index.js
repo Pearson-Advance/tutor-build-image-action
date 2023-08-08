@@ -101,7 +101,7 @@ async function run() {
 
       // Install extra requirements
       if (extra_private_requirements) {
-        core.info('Installing extra private requirements');
+        core.info('Installing extra private requirements.');
         const repositories = parse_bash_array(private_repositories);
         const branches_array = parse_bash_array(branches);
         for (var i=0; i< repositories.length; i++) {
