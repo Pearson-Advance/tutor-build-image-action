@@ -113,21 +113,35 @@ async function run() {
       if (extra_private_requirements) {
         core.info('Installing extra private requirements.');
         const repositories = parse_bash_array(private_repositories);
-        const branches = parse_bash_array(branches);
+        const branches_array = parse_bash_array(branches);
         for (var i=0; i< repositories.length; i++) {
           let repository = repositories[i];
+          let branch = branches_array[i]
           if (repository == "") {
             continue;
           }
-          await exec.exec(
-            'git',
-            [
-              'clone', '-b', branches[i],
-              `https://${gh_access_token}@github.com/Pearson-Advance/${repository}.git`,
-              `${tutor_root}/env/build/openedx/requirements/${repository}`
-            ],
-            options
-          );
+          if (branch) {
+            await exec.exec(
+              'git',
+              [
+                'clone', '-b', branch,
+                `https://${gh_access_token}@github.com/Pearson-Advance/${repository}.git`,
+                `${tutor_root}/env/build/openedx/requirements/${repository}`
+              ],
+              options
+            );
+          }
+          else {
+            await exec.exec(
+              'git',
+              [
+                'clone',
+                `https://${gh_access_token}@github.com/Pearson-Advance/${repository}.git`,
+                `${tutor_root}/env/build/openedx/requirements/${repository}`
+              ],
+              options
+            );
+          }
 
           // Write requirement to the private.txt file
           fs.appendFileSync(`${tutor_root}/env/build/openedx/requirements/private.txt`, `-e ./${repository}\n`);
