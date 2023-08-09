@@ -6,7 +6,7 @@ const fs = require('fs');
 /**
  * Parses a string containing an array of strings in the bash syntax.
  * @param  {String} arr Bash array as a string. Example: ("abc" "def")
- * @return {[type]}     Parsed array.
+ * @return {Object}     Parsed array.
  */
 function parse_bash_array(arr) {
   if (!arr || arr == "()" || arr == "false") {
@@ -16,6 +16,16 @@ function parse_bash_array(arr) {
   Arr = Arr.split(" ");
   Arr = Arr.map(a => a.substring(1, a.length-1));
   return Arr;
+}
+
+/**
+ * Receives an array of strings with tutor plugin names and enables them.
+ * @param  {String} plugins Bash array as a string. Example: ("abc" "def")
+ */
+async function enable_plugins(to_enable, exec_options) {
+  for (var i=0; i < to_enable.length; i++) {
+    await exec.exec('venv/bin/tutor', ['plugins', 'enable', to_enable[i]], exec_options);
+  }
 }
 
 // exec options
@@ -128,22 +138,16 @@ async function run() {
 
       // Enable Tutor plugins (global)
       if (tutor_plugin_names) {
-        core.info('Enabling Tutor plugins');
+        core.info('Enabling Tutor plugins (Global for all services and envorenments).');
         const plugin_names = parse_bash_array(tutor_plugin_names);
-        for (var i=0; i < plugin_names.length; i++) {
-            let plugin_name = plugin_names[i];
-            await exec.exec('venv/bin/tutor', ['plugins', 'enable', plugin_name], options);
-        }
+        await enable_plugins(plugin_names, options);
       }
 
       // Enable Tutor plugins (from tutor pearson plugin, according to service and environment)
       if (tutor_pearson_plugins) {
+        core.info('Enabling Tutor Pearson plugins (According to service and environment).');
         const to_enable = parse_bash_array(tutor_pearson_plugins);
-        
-        for (var i=0; i < to_enable.length; i++) {
-          const plugin_name = to_enable[i];
-          await exec.exec('venv/bin/tutor', ['plugins', 'enable', plugin_name], options);
-        }
+        await enable_plugins(to_enable, options);
       }
 
       // Render Tutor Templates
