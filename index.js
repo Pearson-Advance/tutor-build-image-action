@@ -78,11 +78,10 @@ async function run() {
 
       // Install Tutor plugins
       if (tutor_plugin_sources) {
-          core.info('Installing Tutor plugins');
+          core.info('Installing Tutor plugins.');
           const plugin_sources = parse_bash_array(tutor_plugin_sources);
           for (var i=0; i < plugin_sources.length; i++) {
-              let plugin_source = plugin_sources[i];
-              await exec.exec('venv/bin/pip', ['install', plugin_source], options);
+              await exec.exec('venv/bin/pip', ['install',  plugin_sources[i]], options);
           }
       }
 
@@ -112,19 +111,18 @@ async function run() {
 
       // Install extra requirements
       if (extra_private_requirements) {
-        core.info('Installing extra private requirements');
+        core.info('Installing extra private requirements.');
         const repositories = parse_bash_array(private_repositories);
-        const branches_array = parse_bash_array(branches);
+        const branches = parse_bash_array(branches);
         for (var i=0; i< repositories.length; i++) {
           let repository = repositories[i];
-          let branch = branches_array[i];
           if (repository == "") {
             continue;
           }
           await exec.exec(
             'git',
             [
-              'clone', '-b', branch,
+              'clone', '-b', branches[i],
               `https://${gh_access_token}@github.com/Pearson-Advance/${repository}.git`,
               `${tutor_root}/env/build/openedx/requirements/${repository}`
             ],
