@@ -3937,6 +3937,7 @@ exports["default"] = _default;
 /***/ 212:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
+const core = __nccwpck_require__(127);
 const exec = __nccwpck_require__(49);
 
 /**
@@ -3967,7 +3968,30 @@ async function enable_plugins(to_enable, exec_options) {
     }
 }
 
-module.exports = { parse_bash_array, enable_plugins };
+/**
+ * Moves all contents from a path to another.
+ * @param  {String} old_path Origin path
+ * @param  {String} new_path Target path
+ */
+function move_all(old_path, new_path) {
+    if (!fs.existsSync(old_path)) {
+        core.info(`Path ${themes_path} was not found.`);
+        return;
+    }
+    if (!fs.existsSync(new_path)) {
+        core.info(`Path ${new_path} was not found.`);
+        return;
+    }
+
+    const to_move = fs.readdirSync(old_path);
+
+    for (var i = to_move.length - 1; i >= 0; i--) {
+      let file = to_move[i];
+      fs.renameSync(old_path + file, new_path + file);
+    }
+}
+
+module.exports = { parse_bash_array, enable_plugins, move_all };
 
 /***/ }),
 
@@ -4129,7 +4153,7 @@ const exec = __nccwpck_require__(49);
 
 const fs = __nccwpck_require__(147);
 
-const { parse_bash_array, enable_plugins } = __nccwpck_require__(212);
+const { parse_bash_array, enable_plugins, move_all } = __nccwpck_require__(212);
 
 // exec options
 const options = {
@@ -4268,20 +4292,11 @@ async function run() {
       // Install themes
       if (theme_repository != 'false') {
         const themes_path = `${tutor_root}/env/build/openedx/themes/`;
+        const ecommerce_themes_path = `${tutor_root}/env/plugins/ecommerce/build`
         await exec.exec('git', ['clone', '-b', theme_branch, theme_repository], options);
-
-        var to_move;
-        if (fs.existsSync(themes_path)) {
-          to_move = fs.readdirSync('openedx-themes/edx-platform/');
-        }
-        else {
-          to_move = [];
-        }
-  
-        for (var i = to_move.length - 1; i >= 0; i--) {
-          var file = to_move[i];
-          fs.renameSync('openedx-themes/edx-platform/' + file, themes_path + file);
-        }
+        
+        move_all('openedx-themes/edx-platform/', themes_path);
+        move_all('openedx-themes/ecommerce/', ecommerce_themes_path);
 
       }
   }

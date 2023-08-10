@@ -3,7 +3,7 @@ const exec = require('@actions/exec');
 
 const fs = require('fs');
 
-const { parse_bash_array, enable_plugins } = require('./util.js');
+const { parse_bash_array, enable_plugins, move_all } = require('./util.js');
 
 // exec options
 const options = {
@@ -142,20 +142,11 @@ async function run() {
       // Install themes
       if (theme_repository != 'false') {
         const themes_path = `${tutor_root}/env/build/openedx/themes/`;
+        const ecommerce_themes_path = `${tutor_root}/env/plugins/ecommerce/build`
         await exec.exec('git', ['clone', '-b', theme_branch, theme_repository], options);
-
-        var to_move;
-        if (fs.existsSync(themes_path)) {
-          to_move = fs.readdirSync('openedx-themes/edx-platform/');
-        }
-        else {
-          to_move = [];
-        }
-  
-        for (var i = to_move.length - 1; i >= 0; i--) {
-          var file = to_move[i];
-          fs.renameSync('openedx-themes/edx-platform/' + file, themes_path + file);
-        }
+        
+        move_all('openedx-themes/edx-platform/', themes_path);
+        move_all('openedx-themes/ecommerce/', ecommerce_themes_path);
 
       }
   }

@@ -1,3 +1,4 @@
+const core = require('@actions/core');
 const exec = require('@actions/exec');
 
 /**
@@ -28,4 +29,27 @@ async function enable_plugins(to_enable, exec_options) {
     }
 }
 
-module.exports = { parse_bash_array, enable_plugins };
+/**
+ * Moves all contents from a path to another.
+ * @param  {String} old_path Origin path
+ * @param  {String} new_path Target path
+ */
+function move_all(old_path, new_path) {
+    if (!fs.existsSync(old_path)) {
+        core.info(`Path ${themes_path} was not found.`);
+        return;
+    }
+    if (!fs.existsSync(new_path)) {
+        core.info(`Path ${new_path} was not found.`);
+        return;
+    }
+
+    const to_move = fs.readdirSync(old_path);
+
+    for (var i = to_move.length - 1; i >= 0; i--) {
+      let file = to_move[i];
+      fs.renameSync(old_path + file, new_path + file);
+    }
+}
+
+module.exports = { parse_bash_array, enable_plugins, move_all };
