@@ -3949,7 +3949,7 @@ function parse_bash_array(arr) {
       return [];
     }
     if (arr.at(0) == "'" && arr.at(-1) == "'") {
-        arr = arr.substring(1, a.length-1);
+        arr = arr.substring(1, arr.length-1);
     }
     let Arr = arr.substring(1, arr.length-1);
     Arr = Arr.split(" ");
