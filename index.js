@@ -47,11 +47,9 @@ async function run() {
       await exec.exec('venv/bin/python', ['-m', 'pip', 'install', `tutor==${tutor_version}`], options);
 
       // Install the Tutor Pearson Plugin
-      if (tutor_pearson_plugin_url) {
-          core.info('Installing Tutor Pearson plugin');
-          const gh_token_url = tutor_pearson_plugin_url.replace("GH_TOKEN", gh_access_token);
-          await exec.exec('venv/bin/pip', ['install', gh_token_url], options);
-      }
+      core.info('Installing Tutor Pearson plugin');
+      const gh_token_url = tutor_pearson_plugin_url.replace("GH_TOKEN", gh_access_token);
+      await exec.exec('venv/bin/pip', ['install', gh_token_url], options);
 
       // Install Tutor plugins
       if (tutor_plugin_sources) {
@@ -127,7 +125,7 @@ async function run() {
 
       // Enable Tutor plugins (global)
       if (tutor_plugin_names) {
-        core.info('Enabling Tutor plugins (Global for all services and envorenments).');
+        core.info('Enabling Tutor plugins (Global for all services and environments).');
         const plugin_names = parse_bash_array(tutor_plugin_names);
         await enable_plugins(plugin_names, options);
       }
@@ -135,8 +133,7 @@ async function run() {
       // Enable Tutor plugins (from tutor pearson plugin, according to service and environment)
       if (tutor_pearson_plugins) {
         core.info('Enabling Tutor Pearson plugins (According to service and environment).');
-        const to_enable = parse_bash_array(tutor_pearson_plugins);
-        await enable_plugins(to_enable, options);
+        await enable_plugins(parse_bash_array(tutor_pearson_plugins), options);
       }
 
       // Render Tutor Templates
