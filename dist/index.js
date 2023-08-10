@@ -3940,6 +3940,8 @@ exports["default"] = _default;
 const core = __nccwpck_require__(127);
 const exec = __nccwpck_require__(49);
 
+const fs = __nccwpck_require__(147);
+
 /**
  * Parses a string containing an array of strings in the bash syntax.
  * @param  {String} arr Bash array as a string. Example: ("abc" "def")

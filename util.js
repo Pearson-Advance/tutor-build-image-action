@@ -1,6 +1,8 @@
 const core = require('@actions/core');
 const exec = require('@actions/exec');
 
+const fs = require('fs');
+
 /**
  * Parses a string containing an array of strings in the bash syntax.
  * @param  {String} arr Bash array as a string. Example: ("abc" "def")
