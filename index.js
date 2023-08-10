@@ -158,8 +158,7 @@ async function run() {
       // Enable Tutor plugins (from tutor pearson plugin, according to service and environment)
       if (tutor_pearson_plugins) {
         core.info('Enabling Tutor Pearson plugins (According to service and environment).');
-        const to_enable = parse_bash_array(tutor_pearson_plugins);
-        await enable_plugins(to_enable, options);
+        await enable_plugins(parse_bash_array(tutor_pearson_plugins), options);
       }
 
       // Render Tutor Templates
