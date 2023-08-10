@@ -70,11 +70,9 @@ async function run() {
       await exec.exec('venv/bin/python', ['-m', 'pip', 'install', `tutor==${tutor_version}`], options);
 
       // Install the Tutor Pearson Plugin
-      if (tutor_pearson_plugin_url) {
-          core.info('Installing Tutor Pearson plugin');
-          const gh_token_url = tutor_pearson_plugin_url.replace("GH_TOKEN", gh_access_token);
-          await exec.exec('venv/bin/pip', ['install', gh_token_url], options);
-      }
+      core.info('Installing Tutor Pearson plugin');
+      const gh_token_url = tutor_pearson_plugin_url.replace("GH_TOKEN", gh_access_token);
+      await exec.exec('venv/bin/pip', ['install', gh_token_url], options);
 
       // Install Tutor plugins
       if (tutor_plugin_sources) {
