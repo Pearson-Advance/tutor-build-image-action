@@ -150,7 +150,7 @@ async function run() {
 
       // Enable Tutor plugins (global)
       if (tutor_plugin_names) {
-        core.info('Enabling Tutor plugins (Global for all services and envorenments).');
+        core.info('Enabling Tutor plugins (Global for all services and environments).');
         const plugin_names = parse_bash_array(tutor_plugin_names);
         await enable_plugins(plugin_names, options);
       }
