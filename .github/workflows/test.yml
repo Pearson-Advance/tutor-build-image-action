@@ -1,0 +1,20 @@
+name: Tutor Build Action
+
+on:
+  workflow_dispatch
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ vars.python_version }}
+
+      - run: export INPUT_GH_ACCESS_TOKEN=${{ secrets.GH_PAT }}
+
+      - run: npm test

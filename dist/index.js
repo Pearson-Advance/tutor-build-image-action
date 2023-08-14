@@ -3966,6 +3966,7 @@ function parse_bash_array(arr) {
  */
 async function enable_plugins(to_enable, exec_options) {
     for (var i=0; i < to_enable.length; i++) {
+        core.info(`Enabling ${to_enable[i]}`)
         await exec.exec('venv/bin/tutor', ['plugins', 'enable', to_enable[i]], exec_options);
     }
 }
@@ -4189,14 +4190,13 @@ const theme_branch  = core.getInput('theme_branch');
 
 async function run() {
   try {
-
       // Create and activate virtualenv
       await exec.exec('python3', ['-m', 'venv', 'venv'], options);
       core.info('Virtualenv created');
 
       // Install Tutor
       core.info('Installing Tutor');
-      await exec.exec('venv/bin/python', ['-m', 'pip', 'install', `tutor==${tutor_version}`], options);
+      await exec.exec('venv/bin/python', ['-m', 'pip', 'install', `tutor[full]==${tutor_version}`], options);
 
       // Install the Tutor Pearson Plugin
       core.info('Installing Tutor Pearson plugin');
@@ -4303,8 +4303,10 @@ async function run() {
       }
   }
   catch(error) {
+    console.log(myOutput);
+    console.log(myError);
     console.log(error.message);
-    core.setFailed(error.message);
+    core.setFailed(myError);
   }
 
 }
