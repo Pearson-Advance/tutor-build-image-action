@@ -85,7 +85,7 @@ async function run() {
       // Install extra requirements
       if (extra_private_requirements) {
         core.info('Installing extra private requirements.');
-        for (var i=0; i< repositories.length; i++) {
+        for (var i=0; i< private_repositories.length; i++) {
           let repository = private_repositories[i];
           let branch = branches[i]
           if (repository == "") {
