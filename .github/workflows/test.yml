@@ -10,7 +10,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          repository: Pearson-Advance/tutor-build-image-action@PADV-329
+          repository: Pearson-Advance/tutor-build-image-action
+          ref: VUE/PADV-329
 
       - name: Setup Python
         uses: actions/setup-python@v4
