@@ -1,7 +1,9 @@
 name: Test
 
 on:
-  workflow_dispatch
+  push:
+    branches:
+      - VUE/PADV-329
 
 jobs:
   Build:
