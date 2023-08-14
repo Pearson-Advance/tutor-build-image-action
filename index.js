@@ -26,12 +26,12 @@ options.listeners = {
 const tutor_version = core.getInput('tutor_version');
 const tutor_pearson_plugin_url = core.getInput('tutor_pearson_plugin_url');
 const gh_access_token = core.getInput('gh_access_token');
-const tutor_pearson_plugins = core.getInput('tutor_pearson_plugin_name');
-const tutor_plugin_sources = core.getInput('tutor_plugin_sources');
-const tutor_plugin_names = core.getInput('tutor_plugin_names');
+const tutor_pearson_plugins = parse_bash_arraycore.getInput('tutor_pearson_plugin_name'));
+const tutor_plugin_sources = parse_bash_array(core.getInput('tutor_plugin_sources'));
+const tutor_plugin_names = parse_bash_array(core.getInput('tutor_plugin_names'));
 const extra_private_requirements = core.getBooleanInput('extra_private_requirements');
-const private_repositories = core.getInput('private_repositories');
-const branches = core.getInput('branches');
+const private_repositories = parse_bash_array(core.getInput('private_repositories'));
+const branches = parse_bash_array(core.getInput('branches'));
 const theme_repository  = core.getInput('theme_repository');
 const theme_branch  = core.getInput('theme_branch');
 
