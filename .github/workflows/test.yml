@@ -22,9 +22,7 @@ jobs:
         with:
           node-version: 16
 
-      - run: python3 -m pip install --upgrade pip
-
-      - run: export INPUT_GH_ACCESS_TOKEN=${{ secrets.GH_PAT }}
+      - run: echo "INPUT_GH_ACCESS_TOKEN=${{ secrets.GH_PAT }}" >> $GITHUB_ENV
 
       - run: npm install
 
