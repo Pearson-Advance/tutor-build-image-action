@@ -26,7 +26,7 @@ options.listeners = {
 const tutor_version = core.getInput('tutor_version');
 const tutor_pearson_plugin_url = core.getInput('tutor_pearson_plugin_url');
 const gh_access_token = core.getInput('gh_access_token');
-const tutor_pearson_plugins = parse_bash_arraycore.getInput('tutor_pearson_plugin_name'));
+const tutor_pearson_plugins = parse_bash_array(core.getInput('tutor_pearson_plugin_name'));
 const tutor_plugin_sources = parse_bash_array(core.getInput('tutor_plugin_sources'));
 const tutor_plugin_names = parse_bash_array(core.getInput('tutor_plugin_names'));
 const extra_private_requirements = core.getBooleanInput('extra_private_requirements');
@@ -85,11 +85,9 @@ async function run() {
       // Install extra requirements
       if (extra_private_requirements) {
         core.info('Installing extra private requirements.');
-        const repositories = parse_bash_array(private_repositories);
-        const branches_array = parse_bash_array(branches);
         for (var i=0; i< repositories.length; i++) {
-          let repository = repositories[i];
-          let branch = branches_array[i]
+          let repository = private_repositories[i];
+          let branch = branches[i]
           if (repository == "") {
             continue;
           }
@@ -124,14 +122,13 @@ async function run() {
       // Enable Tutor plugins (global)
       if (tutor_plugin_names) {
         core.info('Enabling Tutor plugins (Global for all services and environments).');
-        const plugin_names = parse_bash_array(tutor_plugin_names);
-        await enable_plugins(plugin_names, options);
+        await enable_plugins(tutor_plugin_names, options);
       }
 
       // Enable Tutor plugins (from tutor pearson plugin, according to service and environment)
       if (tutor_pearson_plugins) {
         core.info('Enabling Tutor Pearson plugins (According to service and environment).');
-        await enable_plugins(parse_bash_array(tutor_pearson_plugins), options);
+        await enable_plugins(tutor_pearson_plugins, options);
       }
 
       // Render Tutor Templates
