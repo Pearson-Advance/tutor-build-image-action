@@ -20,4 +20,6 @@ jobs:
 
       - run: export INPUT_GH_ACCESS_TOKEN=${{ secrets.GH_PAT }}
 
+      - run: npm install
+
       - run: npm test
