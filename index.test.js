@@ -13,7 +13,9 @@ test('test runs', () => {
   process.env['INPUT_BRANCHES'] = '("master" "master" "master")';
   process.env['INPUT_THEME_REPOSITORY'] = 'https://github.com/Pearson-Advance/openedx-themes.git';
   process.env['INPUT_THEME_BRANCH'] = 'pearson-release/olive.stage';
-  
+
+  console.log(process.env);
+
   const ip = path.join(__dirname, 'index.js');
   const result = cp.execSync(`node ${ip}`, {env: process.env, stdio: 'inherit'}).toString();
   console.log(result);
