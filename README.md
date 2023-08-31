@@ -25,7 +25,7 @@ jobs:
     steps:
 
       - name: Build Image
-        uses: pearson-advance/tutor-build-image-action@0.2.0
+        uses: pearson-advance/tutor-build-image-action@v1.1.0
         with:
           path-image-to-be-built: 'env/plugins/ecommerce/build/ecommerce'
           organization-name: 'pearsonopenedxops'
