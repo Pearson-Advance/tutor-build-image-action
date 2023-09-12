@@ -9,7 +9,6 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
   "dependencies": {
     "@actions/core": "^1.10.0",
     "@actions/exec": "^1.1.1",
