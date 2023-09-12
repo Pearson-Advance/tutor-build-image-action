@@ -1,9 +1,7 @@
-name: Test
+name: Tutor Build Action
 
 on:
-  push:
-    branches:
-      - VUE/PADV-329
+  workflow_dispatch
 
 jobs:
   Build:
@@ -17,11 +15,7 @@ jobs:
         with:
           python-version: ${{ vars.python_version }}
 
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-
-      - run: echo "INPUT_GH_ACCESS_TOKEN=${{ secrets.GH_PAT }}" >> $GITHUB_ENV
+      - run: export INPUT_GH_ACCESS_TOKEN=${{ secrets.GH_PAT }}
 
       - run: npm install
 

@@ -39,8 +39,8 @@ inputs:
     description: 'This is the tutor-pearson-plugin branch that will be used to build the image. (e.g., vue/PADV-641)'
     required: false
     default: ''
-  tutor_additional_plugin_sources:
-    description: 'Array containing the GitHub sources urls or the pypi package names of the plugins to install. Example: ("git+https://github.com/overhangio/tutor-ecommerce.git" "git+https://github.com/overhangio/tutor-mfe.git" "tutor-discovery")'
+  tutor_plugin_sources:
+    description: 'Array containing the GitHub sources urls or the pypi package names of the plugins to install. Example: ("https://github.com/overhangio/tutor-ecommerce.git" "https://github.com/overhangio/tutor-mfe.git" "https://github.com/overhangio/tutor-discovery.git")'
     required: false
     default: ''
   tutor_pearson_plugins_to_enable:
