@@ -4066,8 +4066,11 @@ async function installTutorPlugins(tutorPluginSources, options) {
     for (const sourceUrl of tutorPluginSources) {
       try {
           core.info(`Attempting to install ${sourceUrl}...`);
-          const pipArgs = sourceUrl.startsWith('git+') ? ['install', '-e', sourceUrl] : ['install', sourceUrl];
-          await execInVenv('pip', pipArgs, options);
+          await execInVenv(
+            'pip', 
+            sourceUrl.startsWith('git+') ? ['install', '-e', sourceUrl] : ['install', sourceUrl], 
+            options,
+          );
           core.info(`Successfully installed plugin ${sourceUrl}.`);
       } catch (error) {
           throw new Error(`Plugin installation failed for ${sourceUrl}. Error: ${error.message}.`);
