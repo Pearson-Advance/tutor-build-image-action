@@ -6,10 +6,6 @@ inputs:
     description: 'The version of Tutor to be installed. Defaults to 15.3.0.'
     required: true
     default: '15.3.0'
-  extra_private_requirements:
-    description: 'Bool input that indicates if It is necessary to install extra private requirements. Defaults to false.'
-    required: false
-    default: 'false'
   theme_repository:
     description: 'Repository that contains customized themes. The default is "false", which indicates that the functionality of the themes will not be used. \
                   You have to indicate full URL path (e.g., https://github.com/Pearson-Advance/openedx-themes)'
@@ -26,15 +22,6 @@ inputs:
                   When it is already configured, you can add it as a secrets for the repository. \
                   To see how create a secret enter https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository.'
     required: true
-  private_repositories:
-    description: 'Private repositories to be cloned. \
-                  It is an array that contains the name of each repository (e.g., ("pearson-core" "course_operations"))'
-    required: false
-  private_repositories_branches:
-    description: 'It is an array that contains the name of the different target branches to be cloned. \
-                  You have to be careful with this array and repositories array, because both should have the same length, \
-                  and correctly set the branch for each repository.'
-    required: false
   tutor_pearson_plugin_branch:
     description: 'This is the tutor-pearson-plugin branch that will be used to build the image. (e.g., vue/PADV-641)'
     required: false

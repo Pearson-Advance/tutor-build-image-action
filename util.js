@@ -3,6 +3,22 @@ const exec = require('@actions/exec');
 
 const fs = require('fs');
 const path = require('path');
+
+// Standard out and standard error
+let stdout = '';
+let stderr = '';
+const execOptions = {
+  shell: '/bin/bash',
+  listeners: {
+    stdout: (data) => {
+      stdout += data.toString();
+    },
+    stderr: (data) => {
+      stderr += data.toString();
+    },
+  },
+};
+
 /**
  * Parses a string containing an array of strings in the bash syntax.
  * @param  {String} arr Bash array as a string. Example: ("abc" "def")
@@ -27,13 +43,11 @@ function parseBashArray(strBashArray) {
   return parsedArray;
 }
 
-
 /**
  * Receives an array of strings with tutor plugin names and enables them.
  * @param  {Array} pluginsToEnable - Bash array as a string. Example: ["abc", "def"]
- * @param  {Object} execOptions - Additional options for exec command.
  */
-async function enablePlugins(pluginsToEnable, execOptions) {
+async function enablePlugins(pluginsToEnable) {
     if (!pluginsToEnable || pluginsToEnable.length === 0) {
       core.info('No plugins provided to enable. Skipping.');
       return;
@@ -44,7 +58,7 @@ async function enablePlugins(pluginsToEnable, execOptions) {
 
     for (const plugin of pluginsToEnable) {
       core.info(`Enabling ${plugin}`);
-      await execInVenv("tutor", ["plugins", "enable", plugin], execOptions);
+      await execInVenv('tutor', ['plugins', 'enable', plugin]);
     }
 }
 
@@ -79,35 +93,31 @@ function moveAll(oldPath, newPath) {
  * @param {string} tutorVersion - The version of Tutor to install.
  * @param {string} tutorPearsonPluginBranch - The branch of the Pearson plugin for Tutor.
  * @param {string} ghAccessToken - The GitHub access token for private repositories or installations.
- * @param {Object} options - Exec options like shell, listeners etc.
  * @throws Will throw an error if any step in the environment preparation fails.
  * @example ->  await prepareEnvironment('3.12.0', 'https://example.com/pluginUrl', 'myGithubToken', options);
  */
-async function prepareEnvironment(tutorVersion, tutorPearsonPluginBranch = 'main', ghAccessToken, options) {
+async function prepareEnvironment(tutorVersion, tutorPearsonPluginBranch = 'main', ghAccessToken) {
     try {
       // Create and activate virtualenv
-      await exec.exec('python3', ['-m', 'venv', 'venv'], options);
-      await execInVenv('pip', ['install', `tutor==${tutorVersion}`], options);
-      await execInVenv('pip', ['install', '-e', `git+https://${ghAccessToken}@github.com/Pearson-Advance/tutor-pearson-plugin.git@${tutorPearsonPluginBranch}#egg=tutor-pearson-plugin`], options)
+      await exec.exec('python3', ['-m', 'venv', 'venv'], execOptions);
+      await execInVenv('pip', ['install', `tutor==${tutorVersion}`]);
+      await execInVenv('pip', ['install', '-e', `git+https://${ghAccessToken}@github.com/Pearson-Advance/tutor-pearson-plugin.git@${tutorPearsonPluginBranch}#egg=tutor-pearson-plugin`])
       core.info('Succesfully installed Tutor Pearson Plugin');
-      
     } catch (error) {
       core.error(`Environment preparation failed: ${error.message}`);
       throw error;
     }
-} 
+}
 
 /**
  * Executes a given command within a Python virtual environment.
  * @async
  * @param {string} command - The command to execute.
- * @param {Array<string>} args - The list of arguments for the command.
- * @param {Object} options
- * @throws Will throw an error if the command fails to execute.
+ * @param {Array<string>} args - A list of arguments for the command.
  * @example -> execInVenv('pip', ['-m','install', 'package_name']);
  */
-async function execInVenv(command, args, options) {
-    await exec.exec(`venv/bin/${command}`, args, options);
+async function execInVenv(command, args) {
+    await exec.exec(`venv/bin/${command}`, args, execOptions);
 }
 
 /**
@@ -117,7 +127,7 @@ async function execInVenv(command, args, options) {
  * @throws {Error} Throws an error if installation of any plugin fails.
  * @returns {void} Returns nothing; side effect is the installation of plugins.
  */
-async function installTutorPlugins(tutorPluginSources, options) {
+async function installTutorPlugins(tutorPluginSources) {
     if (!Array.isArray(tutorPluginSources) || tutorPluginSources.length === 0) {
       core.warning('No valid Tutor plugin sources provided. Skipping plugin installation.');
       return;
@@ -129,15 +139,14 @@ async function installTutorPlugins(tutorPluginSources, options) {
           core.info(`Attempting to install ${sourceUrl}...`);
           await execInVenv(
             'pip', 
-            sourceUrl.startsWith('git+') ? ['install', '-e', sourceUrl] : ['install', sourceUrl], 
-            options,
+            sourceUrl.startsWith('git+') ? ['install', '-e', sourceUrl] : ['install', sourceUrl],
           );
           core.info(`Successfully installed plugin ${sourceUrl}.`);
       } catch (error) {
           throw new Error(`Plugin installation failed for ${sourceUrl}. Error: ${error.message}.`);
       }
     }
-    core.info("Plugins succesfully installed.");
+    core.info('Plugins succesfully installed.');
 }
 
 /**
@@ -148,28 +157,61 @@ async function installTutorPlugins(tutorPluginSources, options) {
  * @example -> const tutorRoot = await getTutorRoot();
  */
 async function getTutorRoot() {
-    let tutorRoot = '';
-    const tutor_root_options = {
-        shell: '/bin/bash',
-        listeners: {
-          stdout: (data) => {
-            tutorRoot += data.toString();
-          },
-          stderr: (data) => {
-            throw new Error(`Error retrieving tutor root: ${data.toString()}`);
-          },
-        },
-    };
-    
-    await execInVenv('tutor', ['config', 'printroot'], tutor_root_options);
-    tutorRoot = tutorRoot.trim();
-  
-    // Validate tutor root path
-    if (!tutorRoot) {
-      throw new Error(`The tutor root path does not exist.`);
+    try{
+      myout = '';
+      await execInVenv('tutor', ['config', 'printroot']);
+      const tutorRoot = stdout.trim();
+
+      // Validate tutor root path
+      if (!tutorRoot) {
+        throw new Error(`The tutor root path does not exist.`);
+      }
+      return tutorRoot;
+    } catch(error){
+      throw error;
     }
-  
-    return tutorRoot;
+}
+
+/**
+ * Converts a string representation of an object into a JavaScript object.
+ * @param {string} strObject - The string representation of the object.
+ * @throws Will throw an error if the string cannot be parsed into a JavaScript object.
+ * @returns {Object} The JavaScript object parsed from the provided string.
+ * @example -> parseTutorConfigObject('{'myKey': 'myValue'}');
+ */
+function parseTutorConfigObject(strObject){
+  if (strObject == '{}'){ return {} };
+  if (typeof strObject !== 'string'){ throw new Error('Input must be a string.') };
+  if (strObject === '') { throw new Error('Input string cannot be empty') };
+
+  try {
+    const jsonString = strObject.replace(/'/g, '"');
+    return JSON.parse(jsonString);
+  }
+  catch(error) {
+    throw error;
+  }
+}
+
+/**
+ * Obtains a specific Tutor configuration value.
+ * @async
+ * @param {string} key - The key of the configuration value to obtain.
+ * @throws Will throw an error if no key is provided or if an error occurs while obtaining the configuration value.
+ * @returns {string} The configuration value corresponding to the provided key.
+ * @example -> await getTutorConfigValue('myKey');
+ */
+async function getTutorConfigValue(key) {
+  if (!key) {
+    throw new Error('You have to provide a KEY to obtain a tutor config value.');
+  }
+  try {
+    stdout = '';
+    await execInVenv('tutor', ['config', 'printvalue', key]);
+    return stdout.trim();
+  } catch(error) {
+    throw error;
+  }
 }
 
 /**
@@ -178,59 +220,59 @@ async function getTutorRoot() {
  * @param {string} themeRepository - The GitHub URL of the theme repository.
  * @param {string} themeBranch - The branch to clone from the theme repository.
  * @param {string} tutorRoot - The root directory where Tutor is installed.
- * @param {object} options - Additional options for the `exec` method.
  * 
  * @throws Will throw an error if the installation process fails.
  * 
- * @example -> await installThemes('https://github.com/example/repo.git', 'main', '/path/to/tutor/root', options);
+ * @example -> await installThemes('https://github.com/example/repo.git', 'main', '/path/to/tutor/root');
  */
-async function installThemes(themeRepository, themeBranch, tutorRoot, options) {
+async function installThemes(themeRepository, themeBranch, tutorRoot) {
     if (!themeRepository || themeRepository === 'false' || !themeBranch || !tutorRoot) {
       core.info('Skipping theme installation due to insufficient parameters.');
       return;
     }
-  
+
     const themesPath = `${tutorRoot}/env/build/openedx/themes/`;
-  
-    try {
-        core.info(`Starting theme installation from repository: ${themeRepository} and branch: ${themeBranch}`);
-      
-        // Clone the repository and check if it was successful
-        const cloneResult = await exec.exec('git', ['clone', '-b', themeBranch, themeRepository], options);
-        if (cloneResult !== 0) {
-          throw new Error("Failed to clone the theme repository.");
-        }
-        
-        // Check if the destination directories exist
-        if (!fs.existsSync(themesPath)) {
-          throw new Error(`Themes directory ${themesPath} doesn't exist.`);
-        }
-      
-        moveAll('openedx-themes/edx-platform/', themesPath);
-      
-        core.info('Themes installation completed successfully.');
+
+    try { 
+          // Clone 
+          const cloneResult = await exec.exec(
+            'git', 
+            ['clone', '-b', themeBranch, themeRepository], 
+            execOptions,
+          )
+          
+          // Validate cloning and themes path existance
+          if (cloneResult !== 0) {
+            throw new Error('Failed to clone the theme repository.');
+          }          
+          if (!fs.existsSync(themesPath)) {
+            throw new Error(`Themes directory ${themesPath} doesn't exist.`);
+          }
+
+          // Move openedx themes inside the Tutor themes path
+          moveAll('openedx-themes/edx-platform/', themesPath);
+          core.info('Themes installation completed successfully.');
+
       } catch (error) {
-        throw new Error(`Failed to install themes. Error: ${error.message}`);
+        throw error;
       }
 }
 
-
 /**
- * Clones a GitHub repository to a specified directory.
+ * Clones a Pearson-Advance GitHub repository to a specified directory.
  * @async
- * @param {string} repository - The name of the repository to clone.
+ * @param {string} repositoryName - The name of the repository to clone.
  * @param {string|null} branch - The specific branch to clone. If null, the default branch will be cloned.
  * @param {string} targetDir - The directory where the repository should be cloned.
- * @param {Object} options - Additional options passed to the exec command.
  * @param {string} ghAccessToken - GitHub access token for authentication.
  * @throws Will throw an error if the execution fails.
- * @example -> await gitClone('myRepo', 'main', './targetDir', {}, 'ghAccessToken');
+ * @example -> await gitClone('myRepo', 'main', './targetDir', 'ghAccessToken');
  */
-async function gitClone(repositoryName, branch, targetDir, options, ghAccessToken="" ) {
+async function gitClone(repositoryName, branch, targetDir, ghAccessToken='' ) {
     try {
         const branchOption = branch ? ['-b', branch] : [];
-        const authPart = ghAccessToken ? `${ghAccessToken}@` : '';
-        const repoUrl = `https://${authPart}github.com/Pearson-Advance/${repositoryName}.git`;
+        const auth = ghAccessToken ? `${ghAccessToken}@` : '';
+        const repoUrl = `https://${auth}github.com/Pearson-Advance/${repositoryName}.git`;
 
         await exec.exec(
             'git',
@@ -240,63 +282,52 @@ async function gitClone(repositoryName, branch, targetDir, options, ghAccessToke
                 repoUrl,
                 targetDir,
             ],
-            options
+            execOptions,
         );
     } catch (error) {
         throw new Error(`Failed to clone repository: ${error.message}`);
     }
 }
-  
+
 /**
  * Handles the cloning and requirements setup for private repositories.
  * @async
- * @param {Array} privateRepositories - An array containing the names of the private repositories to be cloned.
- * @param {Array} branches - An array containing the branches to be cloned from each repository.
+ * @param {Object} privateRequirements - An Object containing the Pearson-Advance repositories names and their respective branches to be cloned.
  * @param {string} ghAccessToken - GitHub access token to authenticate for private repository cloning.
  * @param {string} tutorRoot - The root directory path where the cloned repositories will be placed.
- * @param {Object} options - Execution options for shell commands.
+ * @throws Will throw an if the execution fails.
  */
-async function handlePrivatePackages(privateRepositories, branches, ghAccessToken, tutorRoot, options) {
-    core.info("Handling private packages...");
-    if (!Array.isArray(privateRepositories) || privateRepositories.length === 0) {
-        core.warning('No private repositories provided.');
-        return;
-    }
-    if (!Array.isArray(branches) || branches.length !== privateRepositories.length) {
-        core.error('Mismatch between number of repositories and number of branches.');
-        throw new Error('Branches and repositories array lengths must match.');
-    }
-    
+async function handlePrivatePackages(privateRequirements, ghAccessToken, tutorRoot) {
+    core.info('Handling private packages...');
+
     const privateTxtPath = `${tutorRoot}/env/build/openedx/requirements/private.txt`;
     const requirements = [];
-    const repoBranchPairs = privateRepositories.map((repository, index) => ({
-      repository,
-      branch: branches[index]
-    }));
-
-    for (const { repository, branch } of repoBranchPairs) {
-      const targetDir = `${tutorRoot}/env/build/openedx/requirements/${repository}`;
-      await gitClone(repository, branch, targetDir, options, ghAccessToken);
-      requirements.push(`-e ./${repository}`);
-    }
-
     try {
+        // Clone private repositories into Tutor private requirements directory
+        for (const [repository, branch] of Object.entries(privateRequirements)) {
+          const targetDir = `${tutorRoot}/env/build/openedx/requirements/${repository}`;
+          await gitClone(repository, branch, targetDir, ghAccessToken);
+          requirements.push(`-e ./${repository}`);
+        }
+
+        // Write every private requirement to the private.txt
         fs.appendFileSync(privateTxtPath, `${requirements.join('\n')}\n`);
     } catch (error) {
-        core.error(`Failed to write to ${privateTxtPath}`);
+        core.error(error.message);
         throw error;
     }
-
 }
 
-module.exports = { 
-  parseBashArray, 
-  enablePlugins, 
-  moveAll, 
-  prepareEnvironment, 
-  execInVenv, 
-  installTutorPlugins, 
-  getTutorRoot, 
-  installThemes, 
-  handlePrivatePackages, 
+module.exports = {
+  parseBashArray,
+  enablePlugins,
+  moveAll,
+  prepareEnvironment,
+  execInVenv,
+  installTutorPlugins,
+  getTutorRoot,
+  getTutorConfigValue,
+  installThemes,
+  handlePrivatePackages,
+  parseTutorConfigObject,
 };

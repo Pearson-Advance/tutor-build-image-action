@@ -7,32 +7,17 @@ const {
   execInVenv,
   installTutorPlugins,
   getTutorRoot,
+  getTutorConfigValue,
   installThemes,
   handlePrivatePackages,
+  parseTutorConfigObject,
 } = require('./util.js');
 
-// Standard out and standard error will be written to these variables
-let myOutput = '';
-let myError = '';
-const execOptions = {
-  shell: '/bin/bash',
-  listeners: {
-    stdout: (data) => {
-      myOutput += data.toString();
-    },
-    stderr: (data) => {
-      myError += data.toString();
-    },
-  },
-};
-
+// Github action variables
 const tutorVersion = core.getInput('tutor_version');
 const tutorPearsonPluginBranch = core.getInput('tutor_pearson_plugin_branch');
 const ghAccessToken = core.getInput('gh_access_token');
 const tutorPluginSources = parseBashArray(core.getInput('tutor_plugin_sources'));
-const extraPrivateRequirements = core.getBooleanInput('extra_private_requirements');
-const privateRepositories = parseBashArray(core.getInput('private_repositories'));
-const privateRepositoriesBranches = parseBashArray(core.getInput('private_repositories_branches'));
 const tutorPluginsToEnable = parseBashArray(core.getInput('tutor_plugins_to_enable'));
 const tutorPearsonPluginsToEnable = parseBashArray(core.getInput('tutor_pearson_plugins_to_enable'));
 const themeRepository = core.getInput('theme_repository');
@@ -40,31 +25,44 @@ const themeBranch = core.getInput('theme_branch');
 
 async function run() {
   try {
-      await prepareEnvironment(tutorVersion, tutorPearsonPluginBranch, ghAccessToken, execOptions);
-      await installTutorPlugins(tutorPluginSources,execOptions);
-      
-      const tutorRoot = await getTutorRoot();
-      if (extraPrivateRequirements) {
-        await handlePrivatePackages(privateRepositories, privateRepositoriesBranches, ghAccessToken, tutorRoot, execOptions);
-      }
+      await prepareEnvironment(
+        tutorVersion,
+        tutorPearsonPluginBranch,
+        ghAccessToken,
+      )
+      await installTutorPlugins(tutorPluginSources);
+
       if (tutorPluginsToEnable) {
-        core.info('Enabling Tutor plugins (for all services and environments).');
-        await enablePlugins(tutorPluginsToEnable, execOptions);
+        core.info('Enabling Tutor plugins');
+        await enablePlugins(tutorPluginsToEnable);
       }
       if (tutorPearsonPluginsToEnable) {
-        core.info('Enabling Tutor Pearson plugins (According to service and environment).');
-        await enablePlugins(tutorPearsonPluginsToEnable, execOptions);
+        core.info('Enabling Tutor Pearson plugins');
+        await enablePlugins(tutorPearsonPluginsToEnable);
       }
-      await execInVenv('tutor', ['config', 'save'], execOptions);
-      await installThemes(themeRepository, themeBranch, tutorRoot, execOptions);
+      await execInVenv('tutor', ['config', 'save']);
+
+      const tutorRoot = await getTutorRoot();
+      const tutorConfigValue = await getTutorConfigValue("OPENEDX_PRIVATE_REQUIREMENTS");
+      const extraPrivateRequirements = parseTutorConfigObject(tutorConfigValue);
+
+      if (extraPrivateRequirements) {
+        await handlePrivatePackages(
+          extraPrivateRequirements,
+          ghAccessToken,
+          tutorRoot,
+        );
+      }
+      await installThemes(
+        themeRepository,
+        themeBranch,
+        tutorRoot,
+      )
   }
   catch(error) {
-      console.log(myOutput);
-      console.log(myError);
       console.log(error.message);
-      core.setFailed(myError);
+      core.setFailed(error.message);
   }
-
 }
 
 run();
