@@ -1,2 +1,41 @@
+# Logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# nyc test coverage
+.nyc_output
+
+# Bower dependency directory (https://bower.io/)
+bower_components
+
+# node-waf configuration
+.lock-wscript
+
+# Dependency directories
 node_modules/
-venv/
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# eslint
+.eslintrc.js
+.eslintcache
+
+# Output of 'npm pack'
+*.tgz
+
+# dotenv environment variables file
+.env
+.env.test
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
